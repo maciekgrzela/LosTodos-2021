@@ -1,0 +1,8 @@
+bin
+obj
+.vscode
+.DS_Store
+.vs
+.csproj.user
+.filenesting.json
+publish
