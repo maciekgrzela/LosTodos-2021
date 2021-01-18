@@ -69,6 +69,12 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   form: {
+    '& .MuiOutlinedInput-input': {
+      padding: '13px 14px',
+    },
+    '& label': {
+      transform: 'translate(14px, 12px) scale(1)',
+    },
     '& .MuiInputBase-root': {
       color: '#fff',
       borderWidth: 4,
@@ -98,8 +104,8 @@ const useStyles = makeStyles((theme) => ({
     marginTop: 10,
     width: '100%',
     backgroundColor: theme.palette.white.main,
-    paddingTop: 15,
-    paddingBottom: 15,
+    paddingTop: 10,
+    paddingBottom: 10,
     color: theme.palette.primary.main,
   },
 }));
