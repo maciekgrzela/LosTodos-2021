@@ -2,7 +2,7 @@ using System;
 
 namespace Domain.Models
 {
-    public class TaskSetTags
+    public class TaskSetTags : ModifiedAndCreatedEntity
     {
         public Guid TaskSetId {get; set; }
         public TaskSet TaskSet {get; set; }

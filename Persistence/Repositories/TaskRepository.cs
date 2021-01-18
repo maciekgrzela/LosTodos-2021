@@ -15,6 +15,11 @@ namespace Persistence.Repositories
             this.context = context;
         }
 
+        public void Delete(Domain.Models.Task task)
+        {
+            context.Tasks.Remove(task);
+        }
+
         public async Task<List<Domain.Models.Task>> GetAllAsync()
         {
             return await context.Tasks
@@ -36,6 +41,16 @@ namespace Persistence.Repositories
         public async Task SaveAsync(Domain.Models.Task task)
         {
             await context.Tasks.AddAsync(task);
+        }
+
+        public async Task<Domain.Models.Task> SearchAsync(Guid id)
+        {
+            return await context.Tasks.FindAsync(id);
+        }
+
+        public void Update(Domain.Models.Task task)
+        {
+            context.Tasks.Update(task);
         }
     }
 }

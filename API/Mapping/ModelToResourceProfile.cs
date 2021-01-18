@@ -15,7 +15,8 @@ namespace API.Mapping
             CreateMap<Task, TaskResource>()
                 .ForMember(dest => dest.TaskSet, opt => opt.MapFrom(p => p.TaskSet));
             CreateMap<Task, TaskForTaskSetResource>();
-            CreateMap<TaskSet, TaskSetResource>();
+            CreateMap<TaskSet, TaskSetResource>()
+                .ForMember(dest => dest.Tags, opt => opt.MapFrom(p => p.TaskSetTags));
             CreateMap<TaskSet, TaskSetForTagResource>();
             CreateMap<TaskSet, SetForTaskResource>()
                 .ForMember(dest => dest.Tags, opt => opt.MapFrom(p => p.TaskSetTags));

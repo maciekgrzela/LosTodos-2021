@@ -7,8 +7,11 @@ namespace Persistence.Repositories.Interfaces
 {
     public interface ITaskSetRepository
     {
-         Task<List<TaskSet>> GetAllAsync();
-         Task<TaskSet> GetAsync(Guid id);
-         Task<TaskSet> SearchAsync(Guid id);
+         System.Threading.Tasks.Task<List<TaskSet>> GetAllAsync();
+         System.Threading.Tasks.Task<TaskSet> GetAsync(Guid id);
+         System.Threading.Tasks.Task<TaskSet> SearchAsync(Guid id);
+         System.Threading.Tasks.Task SaveAsync(TaskSet taskSet);
+         void Update(TaskSet taskSet);
+         void Delete(TaskSet taskSet);
     }
 }

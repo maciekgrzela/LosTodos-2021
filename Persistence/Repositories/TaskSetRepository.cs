@@ -17,6 +17,10 @@ namespace Persistence.Repositories
             this.context = context;
         }
 
+        public void Delete(TaskSet taskSet)
+        {
+            context.TaskSets.Remove(taskSet);
+        }
 
         public async Task<List<TaskSet>> GetAllAsync()
         {
@@ -36,9 +40,19 @@ namespace Persistence.Repositories
                                 .FirstOrDefaultAsync(p => p.Id == id);
         }
 
+        public async System.Threading.Tasks.Task SaveAsync(TaskSet taskSet)
+        {
+            await context.TaskSets.AddAsync(taskSet);
+        }
+
         public async Task<TaskSet> SearchAsync(Guid id)
         {
             return await context.TaskSets.FindAsync(id);
+        }
+
+        public void Update(TaskSet taskSet)
+        {
+            context.TaskSets.Update(taskSet);
         }
     }
 }

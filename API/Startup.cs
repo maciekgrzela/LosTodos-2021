@@ -70,6 +70,7 @@ namespace API
             });
 
             services.AddScoped<ITaskService, TaskService>();
+            services.AddScoped<ITaskSetService, TaskSetService>();
             services.AddScoped<ITaskRepository, TaskRepository>();
             services.AddScoped<ITaskSetRepository, TaskSetRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();

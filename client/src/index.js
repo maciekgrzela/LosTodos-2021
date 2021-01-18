@@ -1,17 +1,46 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
 import App from './App';
-import reportWebVitals from './reportWebVitals';
+import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+import { createBrowserHistory } from 'history';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import { Router } from 'react-router-dom';
+import './Styles/index.css';
+
+const losTodosTheme = createMuiTheme({
+  typography: {
+    fontFamily: 'Bahnschrift, Signika, sans-serif',
+    allVariants: {
+      fontStretch: 'condensed',
+    },
+  },
+  palette: {
+    primary: {
+      main: '#760D0D',
+      light: '#913D3D',
+    },
+    secondary: {
+      main: '#C2C2C2',
+    },
+    white: {
+      main: '#FFFFFF',
+    },
+  },
+  shape: {
+    borderRadius: 30,
+  },
+});
+
+const history = createBrowserHistory();
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <ThemeProvider theme={losTodosTheme}>
+      <CssBaseline />
+      <Router history={history}>
+        <App />
+      </Router>
+    </ThemeProvider>
   </React.StrictMode>,
   document.getElementById('root')
 );
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();

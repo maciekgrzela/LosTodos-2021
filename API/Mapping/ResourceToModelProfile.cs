@@ -1,5 +1,7 @@
 using Application.Resources.Task;
+using Application.Resources.TaskSet;
 using AutoMapper;
+using Domain.Models;
 
 namespace API.Mapping
 {
@@ -8,6 +10,7 @@ namespace API.Mapping
         public ResourceToModelProfile()
         {
             CreateMap<SaveTaskResource, Domain.Models.Task>();
+            CreateMap<SaveTaskSetResource, TaskSet>();
         }
     }
 }
