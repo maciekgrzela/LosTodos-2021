@@ -18,6 +18,21 @@ namespace Application.Services
             this.taskSetRepository = taskSetRepository;
             this.taskRepository = taskRepository;
         }
+
+        public async Task<Response<Domain.Models.Task>> DeleteAsync(Guid id)
+        {
+            var task = await taskRepository.SearchAsync(id);
+
+            if(task == null){
+                return new Response<Domain.Models.Task>($"Zadanie o id:{id} nie zostało znalezione");
+            }
+
+            taskRepository.Delete(task);
+            await unitOfWork.CommitTransactionAsync();
+
+            return new Response<Domain.Models.Task>(task);
+        }
+
         public async Task<List<Domain.Models.Task>> GetAllAsync()
         {
             return await taskRepository.GetAllAsync();
@@ -58,6 +73,30 @@ namespace Application.Services
             await unitOfWork.CommitTransactionAsync();
 
             return new Response<Domain.Models.Task>(entity);
+        }
+
+        public async Task<Response<Domain.Models.Task>> UpdateAsync(Domain.Models.Task task, Guid id)
+        {
+            var currentTask = await taskRepository.SearchAsync(id);
+            var taskSet = await taskSetRepository.SearchAsync(task.TaskSetId);
+
+            if(currentTask == null){
+                return new Response<Domain.Models.Task>($"Zadanie o id:{id} nie zostało znalezione");
+            }
+
+            if(taskSet == null){
+                return new Response<Domain.Models.Task>($"Zbiór zadań o id:{id} nie został znaleziony");
+            }
+
+            currentTask.Name = task.Name;
+            currentTask.TaskSet = taskSet;
+            currentTask.LastChecked = currentTask.Checked != task.Checked ? DateTime.Now : null;
+            currentTask.Checked = task.Checked;
+
+            taskRepository.Update(currentTask);
+            await unitOfWork.CommitTransactionAsync();
+
+            return new Response<Domain.Models.Task>(currentTask);
         }
     }
 }

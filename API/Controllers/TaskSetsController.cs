@@ -2,56 +2,57 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Application.Extensions;
-using Application.Resources.Task;
+using Application.Resources.TaskSet;
 using Application.Services.Interfaces;
 using AutoMapper;
+using Domain.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
     [ApiController]
-    [Route("api/todo")]
-    public class TasksController : Controller
+    [Route("/api/todolist")]
+    public class TaskSetsController : Controller
     {
         private readonly IMapper mapper;
-        private readonly ITaskService taskService;
+        private readonly ITaskSetService taskSetService;
 
-        public TasksController(IMapper mapper, ITaskService taskService)
+        public TaskSetsController(IMapper mapper, ITaskSetService taskSetService)
         {
-            this.taskService = taskService;
+            this.taskSetService = taskSetService;
             this.mapper = mapper;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAllAsync() 
         {
-            var tasks = await taskService.GetAllAsync();
-            var tasksResource = mapper.Map<List<Domain.Models.Task>, List<Application.Resources.Task.TaskResource>>(tasks);
-            return Ok(tasksResource);
+            var taskSets = await taskSetService.GetAllAsync();
+            var taskSetsResource = mapper.Map<List<TaskSet>, List<TaskSetResource>>(taskSets);
+            return Ok(taskSetsResource);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetAsync(Guid id)
         {
-            var response = await taskService.GetAsync(id);
+            var response = await taskSetService.GetAsync(id);
 
             if(!response.Success){
                 return BadRequest(response.Message);
             }
 
-            var taskResource = mapper.Map<Domain.Models.Task, Application.Resources.Task.TaskResource>(response.Value); 
-            return Ok(taskResource);
+            var taskSetResource = mapper.Map<TaskSet, TaskSetResource>(response.Value); 
+            return Ok(taskSetResource);
         }
 
         [HttpPost]
-        public async Task<IActionResult> SaveAsync([FromBody] SaveTaskResource resource) 
+        public async Task<IActionResult> SaveAsync([FromBody] SaveTaskSetResource resource) 
         {
             if(!ModelState.IsValid){
                 return BadRequest(ModelState.GetErrors());
             }
 
-            var task = mapper.Map<SaveTaskResource, Domain.Models.Task>(resource);
-            var response = await taskService.SaveAsync(task);
+            var taskSet = mapper.Map<SaveTaskSetResource, TaskSet>(resource);
+            var response = await taskSetService.SaveAsync(taskSet);
 
             if(!response.Success){
                 return BadRequest(response.Message);
@@ -61,13 +62,14 @@ namespace API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateAsync([FromBody] SaveTaskResource resource, Guid id){
+        public async Task<IActionResult> UpdateAsync([FromBody] SaveTaskSetResource resource, Guid id)
+        {
             if(!ModelState.IsValid){
                 return BadRequest(ModelState.GetErrors());
             }
 
-            var task = mapper.Map<SaveTaskResource, Domain.Models.Task>(resource);
-            var response = await taskService.UpdateAsync(task, id);
+            var taskSet = mapper.Map<SaveTaskSetResource, TaskSet>(resource);
+            var response = await taskSetService.UpdateAsync(taskSet, id);
 
             if(!response.Success){
                 return BadRequest(response.Message);
@@ -78,7 +80,7 @@ namespace API.Controllers
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAsync(Guid id){
-            var response = await taskService.DeleteAsync(id);
+            var response = await taskSetService.DeleteAsync(id);
 
             if(!response.Success){
                 return BadRequest(response.Message);

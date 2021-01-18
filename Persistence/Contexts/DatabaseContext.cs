@@ -1,5 +1,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Threading;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,6 +15,28 @@ namespace Persistence.Contexts
         public DbSet<TaskSetTags> TaskSetTags {get; set;}
         
         public DatabaseContext([NotNullAttribute] DbContextOptions<DatabaseContext> options) : base(options) {}
+
+        public async override System.Threading.Tasks.Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var entries = ChangeTracker
+                .Entries()
+                .Where(e => e.Entity is ModifiedAndCreatedEntity && (
+                        e.State == EntityState.Added
+                        || e.State == EntityState.Modified));
+
+            foreach (var entityEntry in entries)
+            {
+                ((ModifiedAndCreatedEntity)entityEntry.Entity).LastModified = DateTime.Now;
+
+                if (entityEntry.State == EntityState.Added)
+                {
+                    ((ModifiedAndCreatedEntity)entityEntry.Entity).Created = DateTime.Now;
+                }
+            }
+
+            return (await base.SaveChangesAsync(true, cancellationToken));
+        }
+
 
         protected override void OnModelCreating(ModelBuilder builder) {
             base.OnModelCreating(builder);

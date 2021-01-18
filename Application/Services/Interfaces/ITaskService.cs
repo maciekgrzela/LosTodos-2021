@@ -10,5 +10,7 @@ namespace Application.Services.Interfaces
         Task<List<Domain.Models.Task>> GetAllAsync();
         Task<Response<Domain.Models.Task>> GetAsync(Guid id);
         Task<Response<Domain.Models.Task>> SaveAsync(Domain.Models.Task task);
+        Task<Response<Domain.Models.Task>> UpdateAsync(Domain.Models.Task task, Guid id);
+        Task<Response<Domain.Models.Task>> DeleteAsync(Guid id);
     }
 }
