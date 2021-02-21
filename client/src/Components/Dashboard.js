@@ -1,18 +1,15 @@
-import {
-  makeStyles,
-  Typography,
-  Button,
-  TextField,
-  Grid,
-  Divider,
-  Avatar,
-  Chip,
-} from '@material-ui/core';
-import React, { useState } from 'react';
+import { makeStyles, Grid } from '@material-ui/core';
+import React, { useContext, useState } from 'react';
 import Aside from './Aside/Aside';
 import Navbar from './Navbar/Navbar';
 import Drawer from './Drawer/Drawer';
 import AddTodo from './Todo/AddTodo';
+import { LosTodosContext } from '../App';
+import { Route, Switch, useRouteMatch, Link } from 'react-router-dom';
+import ShowTodo from './Todo/ShowTodo';
+import ShowTag from './Tag/ShowTag';
+import ShowDate from './Date/ShowDate';
+import MyData from './User/MyData';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -32,8 +29,9 @@ const useStyles = makeStyles((theme) => ({
   mainContent: {
     flexGrow: 1,
   },
-  addTodo: {
-    padding: '120px 40px 0 40px',
+  todoMainView: {
+    height: '100vh',
+    overflow: 'auto',
   },
   aside: {
     backgroundColor: 'rgba(112,112,112, 0.13)',
@@ -44,40 +42,53 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const TodoDashboard = ({ setLogged }) => {
+const Dashboard = () => {
   const styles = useStyles();
-
-  const [user, setUser] = useState({
-    firstName: 'Maciej',
-    lastName: 'Grzela',
-    dateOfBirth: '1997-11-07T00:00:00.000000',
-    phoneNumber: null,
-    eMail: 'maciekgrzela45@gmail.com',
-  });
-
   const [toggledOnMobile, setToggledOnMobile] = useState(false);
+
+  let { path } = useRouteMatch();
 
   return (
     <div className={styles.root}>
       <header>
         <Navbar
-          user={user}
-          setLogged={setLogged}
           toggledOnMobile={toggledOnMobile}
           setToggledOnMobile={setToggledOnMobile}
         />
       </header>
       <nav className={styles.drawer} aria-label='todos search'>
         <Drawer
-          setLogged={setLogged}
           toggledOnMobile={toggledOnMobile}
           setToggledOnMobile={setToggledOnMobile}
         />
       </nav>
       <main className={styles.mainContent}>
         <Grid container>
-          <Grid className={styles.addTodo} item md={9} sm={7} xs={12} container>
-            <AddTodo />
+          <Grid
+            className={styles.todoMainView}
+            item
+            md={9}
+            sm={7}
+            xs={12}
+            container
+          >
+            <Switch>
+              <Route exact path={path}>
+                <AddTodo />
+              </Route>
+              <Route path={`${path}edit/:id`}>
+                <ShowTodo />
+              </Route>
+              <Route path={`${path}tag/:id`}>
+                <ShowTag />
+              </Route>
+              <Route path={`${path}date/:id`}>
+                <ShowDate />
+              </Route>
+              <Route path={`${path}me`}>
+                <MyData />
+              </Route>
+            </Switch>
           </Grid>
           <Grid
             item
@@ -99,4 +110,4 @@ const TodoDashboard = ({ setLogged }) => {
   );
 };
 
-export default TodoDashboard;
+export default Dashboard;

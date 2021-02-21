@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
@@ -28,6 +29,18 @@ namespace Persistence.Repositories
                                 .Include(p => p.Tasks)
                                 .Include(p => p.TaskSetTags)
                                 .ThenInclude(p => p.Tag)
+                                .Include(p => p.Owner)
+                                .ToListAsync();
+        }
+
+        public async Task<List<TaskSet>> GetAllForUserAsync(string id)
+        {
+            return await context.TaskSets
+                                .Include(p => p.Tasks)
+                                .Include(p => p.TaskSetTags)
+                                .ThenInclude(p => p.Tag)
+                                .Include(p => p.Owner)
+                                .Where(p => p.OwnerId == id)
                                 .ToListAsync();
         }
 
@@ -37,6 +50,7 @@ namespace Persistence.Repositories
                                 .Include(p => p.Tasks)
                                 .Include(p => p.TaskSetTags)
                                 .ThenInclude(p => p.Tag)
+                                .Include(p => p.Owner)
                                 .FirstOrDefaultAsync(p => p.Id == id);
         }
 
@@ -48,6 +62,11 @@ namespace Persistence.Repositories
         public async Task<TaskSet> SearchAsync(Guid id)
         {
             return await context.TaskSets.FindAsync(id);
+        }
+
+        public async Task<TaskSet> SearchByNameAsync(string name)
+        {
+            return await context.TaskSets.FirstOrDefaultAsync(p => p.Name == name);
         }
 
         public void Update(TaskSet taskSet)

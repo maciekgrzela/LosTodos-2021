@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { makeStyles, Grid, Typography, Divider } from '@material-ui/core';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
+import { useHistory } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
   calendar: {
@@ -50,6 +51,7 @@ const useStyles = makeStyles((theme) => ({
 const AsideCalendar = () => {
   const styles = useStyles();
   const [currentDate, setCurrentDate] = useState(new Date());
+  const history = useHistory();
 
   return (
     <Grid container item>
@@ -61,6 +63,11 @@ const AsideCalendar = () => {
         className={styles.calendar}
         value={currentDate}
         onChange={setCurrentDate}
+        onClickDay={(value, e) => {
+          let date = new Date(value);
+          date.setDate(date.getDate() + 1);
+          history.push(`/date/${date.toISOString().substr(0, 10)}`);
+        }}
       />
     </Grid>
   );

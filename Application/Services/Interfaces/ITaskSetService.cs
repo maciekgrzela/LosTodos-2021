@@ -9,6 +9,7 @@ namespace Application.Services.Interfaces
     public interface ITaskSetService
     {
         Task<List<TaskSet>> GetAllAsync();
+        Task<Response<List<TaskSet>>> GetAllForUserAsync();
         Task<Response<TaskSet>> GetAsync(Guid id);
         Task<Response<TaskSet>> SaveAsync(TaskSet taskSet);
         Task<Response<TaskSet>> UpdateAsync(TaskSet taskSet, Guid id);

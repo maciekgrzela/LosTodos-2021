@@ -1,0 +1,239 @@
+.success-checkmark {
+  width: 160px;
+  height: 230px;
+}
+
+.success-checkmark .check-icon {
+  width: 160px;
+  height: 160px;
+  position: relative;
+  border-radius: 50%;
+  -webkit-box-sizing: content-box;
+  box-sizing: content-box;
+  background-color: rgba(118, 13, 13, 0.1);
+  border: 8px solid #760d0d;
+}
+
+.success-checkmark .check-icon::before {
+  top: 6px;
+  left: -4px;
+  width: 60px;
+  -webkit-transform-origin: 100% 50%;
+  transform-origin: 100% 50%;
+  border-radius: 200px 0 0 200px;
+}
+
+.success-checkmark .check-icon::after {
+  top: 0;
+  left: 60px;
+  width: 120px;
+  -webkit-transform-origin: 0 50%;
+  transform-origin: 0 50%;
+  border-radius: 0 200px 200px 0;
+  -webkit-animation: rotate-circle 4.25s ease-out;
+  animation: rotate-circle 4.25s ease-out;
+}
+
+.success-checkmark .check-icon::before,
+.success-checkmark .check-icon::after {
+  content: '';
+  height: 200px;
+  position: absolute;
+  background-color: #fafafa;
+  -webkit-transform: rotate(-45deg);
+  transform: rotate(-45deg);
+}
+
+.success-checkmark .icon-line {
+  height: 10px;
+  background-color: rgb(118, 13, 13);
+  display: block;
+  border-radius: 4px;
+  position: absolute;
+  z-index: 10;
+}
+
+.success-checkmark .icon-line.line-tip {
+  top: 92px;
+  left: 28px;
+  width: 50px;
+  -webkit-transform: rotate(45deg);
+  transform: rotate(45deg);
+  -webkit-animation: icon-line-tip 0.75s;
+  animation: icon-line-tip 0.75s;
+}
+
+.success-checkmark .icon-line.line-long {
+  top: 76px;
+  right: 16px;
+  width: 94px;
+  -webkit-transform: rotate(-45deg);
+  transform: rotate(-45deg);
+  -webkit-animation: icon-line-long 0.75s;
+  animation: icon-line-long 0.75s;
+}
+
+.success-checkmark .icon-circle {
+  top: -8px;
+  left: -8px;
+  z-index: 10;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  position: absolute;
+  -webkit-box-sizing: content-box;
+  box-sizing: content-box;
+  border: 8px solid rgba(118, 13, 13, 0.5);
+}
+
+.success-checkmark .icon-fix {
+  top: 16px;
+  width: 10px;
+  left: 52px;
+  z-index: 1;
+  height: 170px;
+  position: absolute;
+  -webkit-transform: rotate(-45deg);
+  transform: rotate(-45deg);
+  background-color: #fafafa;
+}
+
+@-webkit-keyframes rotate-circle {
+  0% {
+    -webkit-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+  }
+  5% {
+    -webkit-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+  }
+  12% {
+    -webkit-transform: rotate(-405deg);
+    transform: rotate(-405deg);
+  }
+  100% {
+    -webkit-transform: rotate(-405deg);
+    transform: rotate(-405deg);
+  }
+}
+
+@keyframes rotate-circle {
+  0% {
+    -webkit-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+  }
+  5% {
+    -webkit-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+  }
+  12% {
+    -webkit-transform: rotate(-405deg);
+    transform: rotate(-405deg);
+  }
+  100% {
+    -webkit-transform: rotate(-405deg);
+    transform: rotate(-405deg);
+  }
+}
+
+@-webkit-keyframes icon-line-tip {
+  0% {
+    width: 0;
+    left: 2px;
+    top: 38px;
+  }
+  54% {
+    width: 0;
+    left: 2px;
+    top: 38px;
+  }
+  70% {
+    width: 100px;
+    left: -16px;
+    top: 74px;
+  }
+  84% {
+    width: 34px;
+    left: 42px;
+    top: 96px;
+  }
+  100% {
+    width: 50px;
+    left: 28px;
+    top: 90px;
+  }
+}
+
+@keyframes icon-line-tip {
+  0% {
+    width: 0;
+    left: 2px;
+    top: 38px;
+  }
+  54% {
+    width: 0;
+    left: 2px;
+    top: 38px;
+  }
+  70% {
+    width: 100px;
+    left: -16px;
+    top: 74px;
+  }
+  84% {
+    width: 34px;
+    left: 42px;
+    top: 96px;
+  }
+  100% {
+    width: 50px;
+    left: 28px;
+    top: 90px;
+  }
+}
+
+@-webkit-keyframes icon-line-long {
+  0% {
+    width: 0;
+    right: 92px;
+    top: 108px;
+  }
+  65% {
+    width: 0;
+    right: 92px;
+    top: 108px;
+  }
+  84% {
+    width: 110px;
+    right: 0px;
+    top: 70px;
+  }
+  100% {
+    width: 94px;
+    right: 16px;
+    top: 76px;
+  }
+}
+
+@keyframes icon-line-long {
+  0% {
+    width: 0;
+    right: 92px;
+    top: 108px;
+  }
+  65% {
+    width: 0;
+    right: 92px;
+    top: 108px;
+  }
+  84% {
+    width: 110px;
+    right: 0px;
+    top: 70px;
+  }
+  100% {
+    width: 94px;
+    right: 16px;
+    top: 76px;
+  }
+}

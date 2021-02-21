@@ -5,6 +5,8 @@ using Application.Extensions;
 using Application.Resources.Task;
 using Application.Services.Interfaces;
 using AutoMapper;
+using Domain.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
@@ -22,6 +24,7 @@ namespace API.Controllers
             this.mapper = mapper;
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> GetAllAsync() 
         {
@@ -30,6 +33,7 @@ namespace API.Controllers
             return Ok(tasksResource);
         }
 
+        [Authorize(Roles = "Admin,RegularUser")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetAsync(Guid id)
         {
@@ -43,6 +47,20 @@ namespace API.Controllers
             return Ok(taskResource);
         }
 
+        [Authorize(Roles = "Admin,RegularUser")]
+        [HttpGet("stats/{days}")]
+        public async Task<IActionResult> GetProductivityStats(int days)
+        {
+            var response = await taskService.GetProductivityStats(days);
+            if(!response.Success){
+                return BadRequest(response.Message);
+            }
+
+            var taskResource = mapper.Map<ProductivityStat, ProductivityStatResource>(response.Value); 
+            return Ok(taskResource);
+        }
+
+        [Authorize(Roles = "Admin,RegularUser")]
         [HttpPost]
         public async Task<IActionResult> SaveAsync([FromBody] SaveTaskResource resource) 
         {
@@ -57,9 +75,28 @@ namespace API.Controllers
                 return BadRequest(response.Message);
             }
 
+            return Ok(response.Value.Id);
+        }
+
+        [Authorize(Roles = "Admin,RegularUser")]
+        [HttpPost("list")]
+        public async Task<IActionResult> SaveListAsync([FromBody] List<SaveTaskResource> resource) 
+        {
+            if(!ModelState.IsValid){
+                return BadRequest(ModelState.GetErrors());
+            }
+
+            var task = mapper.Map<List<SaveTaskResource>, List<Domain.Models.Task>>(resource);
+            var response = await taskService.SaveListAsync(task);
+
+            if(!response.Success){
+                return BadRequest(response.Message);
+            }
+
             return NoContent();
         }
 
+        [Authorize(Roles = "Admin,RegularUser")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateAsync([FromBody] SaveTaskResource resource, Guid id){
             if(!ModelState.IsValid){
@@ -76,6 +113,7 @@ namespace API.Controllers
             return NoContent();
         }
 
+        [Authorize(Roles = "Admin,RegularUser")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAsync(Guid id){
             var response = await taskService.DeleteAsync(id);

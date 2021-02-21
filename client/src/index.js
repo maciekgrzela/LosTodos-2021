@@ -1,11 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './App';
+import { App } from './App';
 import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import { createBrowserHistory } from 'history';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { Router } from 'react-router-dom';
 import './Styles/index.css';
+import './Styles/scrollbar.css';
 
 const losTodosTheme = createMuiTheme({
   typography: {

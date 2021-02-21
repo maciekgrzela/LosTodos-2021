@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
   makeStyles,
   Grid,
@@ -7,6 +7,8 @@ import {
   Avatar,
   Typography,
 } from '@material-ui/core';
+import { LosTodosContext } from '../../App';
+import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
   list: {
@@ -27,6 +29,17 @@ const useStyles = makeStyles((theme) => ({
 
 const AsideTags = () => {
   const styles = useStyles();
+
+  const { myTags } = useContext(LosTodosContext);
+
+  const [popularTags, setPopularTags] = useState([]);
+
+  useEffect(() => {
+    let tags = myTags.sort((a, b) => b.taskSets.length - a.taskSets.length);
+    console.log(tags);
+    setPopularTags(tags);
+  }, [myTags]);
+
   return (
     <Grid container item>
       <Typography variant='h5' className={styles.title}>
@@ -34,22 +47,24 @@ const AsideTags = () => {
       </Typography>
       <Divider className={styles.divider} />
       <Grid container className={styles.list}>
-        <Chip
-          avatar={<Avatar>#</Avatar>}
-          label='Gotowanie'
-          onClick={() => {}}
-        />
-        <Chip avatar={<Avatar>#</Avatar>} label='Pranie' onClick={() => {}} />
-        <Chip
-          avatar={<Avatar>#</Avatar>}
-          label='Produktywność'
-          onClick={() => {}}
-        />
-        <Chip avatar={<Avatar>#</Avatar>} label='Nauka' onClick={() => {}} />
-        <Chip avatar={<Avatar>#</Avatar>} label='Uczelnia' onClick={() => {}} />
-        <Chip avatar={<Avatar>#</Avatar>} label='Sport' onClick={() => {}} />
-        <Chip avatar={<Avatar>#</Avatar>} label='Rozwój' onClick={() => {}} />
-        <Chip avatar={<Avatar>#</Avatar>} label='Porządki' onClick={() => {}} />
+        {popularTags.map((tag, index) => {
+          if (index < 10) {
+            return (
+              <Link
+                style={{ textDecoration: 'none' }}
+                to={{ pathname: `/tag/${tag.id}` }}
+              >
+                <Chip
+                  avatar={<Avatar>#</Avatar>}
+                  label={tag.name}
+                  onClick={() => {}}
+                />
+              </Link>
+            );
+          } else {
+            return <></>;
+          }
+        })}
       </Grid>
     </Grid>
   );

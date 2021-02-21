@@ -19,7 +19,7 @@ const useStyles = makeStyles((theme) => ({
   navbarUserButton: {},
 }));
 
-const Navbar = ({ user, setLogged, toggledOnMobile, setToggledOnMobile }) => {
+const Navbar = ({ toggledOnMobile, setToggledOnMobile }) => {
   const styles = useStyles();
 
   return (
@@ -36,7 +36,7 @@ const Navbar = ({ user, setLogged, toggledOnMobile, setToggledOnMobile }) => {
             <NavbarBreadcrumb />
           </Grid>
           <Grid item className={styles.navbarUserButton}>
-            <NavbarUserButton user={user} setLogged={setLogged} />
+            <NavbarUserButton />
           </Grid>
         </Grid>
       </Toolbar>

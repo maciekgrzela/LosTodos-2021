@@ -3,11 +3,13 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using Domain.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Persistence.Contexts
 {
-    public class DatabaseContext : DbContext
+    public class DatabaseContext : IdentityDbContext<AppUser, IdentityRole, string>
     {
         public DbSet<Tag> Tags {get; set; }
         public DbSet<Task> Tasks {get; set; }
@@ -47,18 +49,32 @@ namespace Persistence.Contexts
                 .HasForeignKey(p => p.TaskSetId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            builder.Entity<AppUser>()
+                .HasMany(p => p.Tags)
+                .WithOne(p => p.Owner)
+                .HasForeignKey(p => p.OwnerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<AppUser>()
+                .HasMany(p => p.TaskSets)
+                .WithOne(p => p.Owner)
+                .HasForeignKey(p => p.OwnerId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             builder.Entity<TaskSetTags>()
                 .HasKey(tst => new {tst.TagId, tst.TaskSetId});
 
             builder.Entity<TaskSetTags>()
                 .HasOne(p => p.TaskSet)
                 .WithMany(p => p.TaskSetTags)
-                .HasForeignKey(p => p.TaskSetId);
+                .HasForeignKey(p => p.TaskSetId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<TaskSetTags>()
                 .HasOne(p => p.Tag)
                 .WithMany(p => p.TaskSetTags)
-                .HasForeignKey(p => p.TagId);
+                .HasForeignKey(p => p.TagId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<Task>()
                 .HasOne(p => p.TaskSet)

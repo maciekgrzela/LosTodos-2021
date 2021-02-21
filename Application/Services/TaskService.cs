@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Application.Responses;
 using Application.Services.Interfaces;
+using Domain.Models;
+using Microsoft.AspNetCore.Identity;
 using Persistence.Repositories.Interfaces;
 
 namespace Application.Services
@@ -12,8 +14,12 @@ namespace Application.Services
         private readonly ITaskRepository taskRepository;
         private readonly ITaskSetRepository taskSetRepository;
         private readonly IUnitOfWork unitOfWork;
-        public TaskService(ITaskRepository taskRepository, ITaskSetRepository taskSetRepository, IUnitOfWork unitOfWork)
+        private readonly UserManager<AppUser> userManager;
+        private readonly IUserAccessor userAccessor;
+        public TaskService(ITaskRepository taskRepository, ITaskSetRepository taskSetRepository, IUnitOfWork unitOfWork, UserManager<AppUser> userManager, IUserAccessor userAccessor)
         {
+            this.userAccessor = userAccessor;
+            this.userManager = userManager;
             this.unitOfWork = unitOfWork;
             this.taskSetRepository = taskSetRepository;
             this.taskRepository = taskRepository;
@@ -23,7 +29,8 @@ namespace Application.Services
         {
             var task = await taskRepository.SearchAsync(id);
 
-            if(task == null){
+            if (task == null)
+            {
                 return new Response<Domain.Models.Task>($"Zadanie o id:{id} nie zostało znalezione");
             }
 
@@ -48,6 +55,24 @@ namespace Application.Services
             }
 
             return new Response<Domain.Models.Task>(task);
+        }
+
+        public async Task<Response<Domain.Models.ProductivityStat>> GetProductivityStats(int days)
+        {
+            if (days <= 0)
+            {
+                return new Response<Domain.Models.ProductivityStat>("Liczba dni musi być liczbą dodatnią!");
+            }
+
+            var user = await userManager.FindByNameAsync(userAccessor.GetLoggedUserEmail());
+
+            if (user == null)
+            {
+                return new Response<Domain.Models.ProductivityStat>("Zaloguj się do systemu w celu wykonania operacji");
+            }
+
+            var result = await taskRepository.GetProductivityStats(days, user.Id);
+            return new Response<Domain.Models.ProductivityStat>(result);
         }
 
         public async Task<Response<Domain.Models.Task>> SaveAsync(Domain.Models.Task task)
@@ -75,16 +100,33 @@ namespace Application.Services
             return new Response<Domain.Models.Task>(entity);
         }
 
+        public async Task<Response<Domain.Models.Task>> SaveListAsync(List<Domain.Models.Task> tasks)
+        {
+            foreach (var task in tasks)
+            {
+                var saved = await this.SaveAsync(task);
+                if (!saved.Success)
+                {
+                    return new Response<Domain.Models.Task>(saved.Message);
+                }
+            }
+            await unitOfWork.CommitTransactionAsync();
+
+            return new Response<Domain.Models.Task>(new Domain.Models.Task());
+        }
+
         public async Task<Response<Domain.Models.Task>> UpdateAsync(Domain.Models.Task task, Guid id)
         {
             var currentTask = await taskRepository.SearchAsync(id);
             var taskSet = await taskSetRepository.SearchAsync(task.TaskSetId);
 
-            if(currentTask == null){
+            if (currentTask == null)
+            {
                 return new Response<Domain.Models.Task>($"Zadanie o id:{id} nie zostało znalezione");
             }
 
-            if(taskSet == null){
+            if (taskSet == null)
+            {
                 return new Response<Domain.Models.Task>($"Zbiór zadań o id:{id} nie został znaleziony");
             }
 
