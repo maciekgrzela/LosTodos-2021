@@ -137,7 +137,7 @@ const ShowDate = () => {
           <span>Przecież tu nikogo nie ma :(</span>
         )}
         <Typography variant='h5'>
-          Utworzone zadania niezrealizowane: ({checkedTodos.length})
+          Utworzone zadania niezrealizowane: ({createdTodos.length})
         </Typography>
         <Divider />
         {createdTodos.length !== 0 ? (

@@ -56,6 +56,26 @@ namespace API.Controllers
             return Ok(resource);
         }
 
+        [AllowAnonymous]
+        [HttpPost("login/facebook")]
+        public async Task<ActionResult> FacebookLogin([FromBody] FacebookAccessTokenResource accessTokenResource)
+        {
+            if(!ModelState.IsValid)
+            {
+                return BadRequest(ModelState.GetErrors());
+            }
+
+            var result = await userService.FacebookLogin(accessTokenResource.AccessToken);
+
+            if(!result.Success)
+            {
+                return Unauthorized(result.Message);
+            }
+
+            var resource = mapper.Map<LoggedUser, LoggedUserResource>(result.Value);
+            return Ok(resource);
+        }
+
         [Authorize(Roles = "Admin")]
         [HttpPost("register/admin")]
         public async Task<IActionResult> RegisterAdmin([FromBody] RegisterCredentialsResource registerCredentials)

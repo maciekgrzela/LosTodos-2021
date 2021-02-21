@@ -134,6 +134,7 @@ namespace API
 
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IUserAccessor, UserAccessor>();
+            services.AddScoped<IFacebookAccessor, FacebookAccessor>();
             services.AddScoped<IWebTokenGenerator, WebTokenGenerator>();
             services.AddScoped<ITaskService, TaskService>();
             services.AddScoped<ITaskSetService, TaskSetService>();
@@ -143,6 +144,7 @@ namespace API
             services.AddScoped<ITagRepository, TagRepository>();
             services.AddScoped<ITaskSetTagRepository, TaskSetTagRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.Configure<FacebookAppSettings>(Configuration.GetSection("Authentication:Facebook"));
 
             services.AddAutoMapper(typeof(Startup));
         }

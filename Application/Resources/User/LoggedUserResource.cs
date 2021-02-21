@@ -10,6 +10,7 @@ namespace Application.Resources.User
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
         public string UserName { get; set; }
+        public string PhotoUrl { get; set; }
         public DateTime DateOfBirth { get; set; }
     }
 }

@@ -1,3 +1,5 @@
+using System;
+using System.Collections.ObjectModel;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Application.Responses;
@@ -15,9 +17,11 @@ namespace Application.Services
         private readonly IWebTokenGenerator webTokenGenerator;
         private readonly RoleManager<IdentityRole> roleManager;
         private readonly IUserAccessor userAccessor;
+        private readonly IFacebookAccessor facebookAccessor;
 
-        public UserService(SignInManager<AppUser> signInManager, UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager, IWebTokenGenerator webTokenGenerator, IUserAccessor userAccessor)
+        public UserService(SignInManager<AppUser> signInManager, UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager, IWebTokenGenerator webTokenGenerator, IUserAccessor userAccessor, IFacebookAccessor facebookAccessor)
         {
+            this.facebookAccessor = facebookAccessor;
             this.userAccessor = userAccessor;
             this.roleManager = roleManager;
             this.webTokenGenerator = webTokenGenerator;
@@ -25,11 +29,70 @@ namespace Application.Services
             this.signInManager = signInManager;
         }
 
+        public async Task<Response<LoggedUser>> FacebookLogin(string accessToken)
+        {
+            var userInfo = await facebookAccessor.FacebookLogin(accessToken); 
+            if(userInfo == null)
+            {
+                return new Response<LoggedUser>("Nie udało się zalogować z wykorzystaniem dostawcy: Facebook");
+            }
+
+            var user = await userManager.FindByNameAsync("fb_" + userInfo.Id);
+
+            if(user == null)
+            {
+                user = new AppUser
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    FirstName = userInfo.Name.Split(' ', 2)[0],
+                    LastName = userInfo.Name.Split(' ', 2)[1],
+                    Email = userInfo.Email,
+                    UserName = "fb_" + userInfo.Id,
+                    DateOfBirth = DateTime.Now,
+                    PhotoUrl = userInfo.Picture.Data.Url,
+                    Tags = new Collection<Tag>(),
+                    TaskSets = new Collection<TaskSet>(),
+                };
+
+                var result = await userManager.CreateAsync(user);
+
+                if(!result.Succeeded)
+                {
+                    return new Response<LoggedUser>("Nie udało się utworzyć konta użytkownika dla podanych informacjiA");
+                }
+
+                await userManager.AddToRoleAsync(user, "RegularUser");
+                await userManager.AddClaimAsync(user, new Claim(ClaimTypes.Role, "RegularUser"));
+            }
+
+            var existingRole = await roleManager.RoleExistsAsync("RegularUser");
+
+            if (!existingRole)
+            {
+                return new Response<LoggedUser>("Nie udało się utworzyć konta użytkownika dla podanych informacjiB");
+            }
+
+            var loggedUser = new LoggedUser
+            {
+                Id = user.Id,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                DateOfBirth = user.DateOfBirth,
+                UserName = user.UserName,
+                PhoneNumber = user.PhoneNumber,
+                Email = user.Email,
+                PhotoUrl = user.PhotoUrl,
+                Token = webTokenGenerator.CreateToken(user, "RegularUser")
+            };
+
+            return new Response<LoggedUser>(loggedUser);
+        }
+
         public async Task<Response<LoggedUser>> GetCurrentUser()
         {
             var user = await userManager.FindByNameAsync(userAccessor.GetLoggedUserEmail());
 
-            if(user == null)
+            if (user == null)
             {
                 return new Response<LoggedUser>("Użytkownik nie jest aktualnie zalogowany");
             }
@@ -106,6 +169,8 @@ namespace Application.Services
                 LastName = credentials.LastName,
                 DateOfBirth = credentials.DateOfBirth,
                 Email = credentials.Email,
+                Tags = new Collection<Tag>(),
+                TaskSets = new Collection<TaskSet>(),
             };
 
             var result = await userManager.CreateAsync(user, credentials.Password);
@@ -150,7 +215,7 @@ namespace Application.Services
 
             var result = await userManager.UpdateAsync(existingUser);
 
-            if(!result.Succeeded)
+            if (!result.Succeeded)
             {
                 return new Response<UpdateUser>(result.Errors.ToString());
             }

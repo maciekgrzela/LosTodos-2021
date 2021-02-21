@@ -54,8 +54,11 @@ const NavbarUserButton = () => {
           <Avatar
             style={{ marginRight: 10, backgroundColor: '#FD3F3F' }}
             alt={`${user.firstName} ${user.lastName}`}
+            src={user.photoUrl !== null ? user.photoUrl : ''}
           >
-            {`${user.firstName.substr(0, 1)}${user.lastName.substr(0, 1)}`}
+            {user.photoUrl === null
+              ? `${user.firstName.substr(0, 1)}${user.lastName.substr(0, 1)}`
+              : ''}
           </Avatar>
           <Typography>
             {user.firstName} {user.lastName}

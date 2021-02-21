@@ -10,15 +10,10 @@ import {
 } from '@material-ui/core';
 import { Face, LockOpen } from '@material-ui/icons';
 import { Alert } from '@material-ui/lab';
-import {
-  AiOutlineFacebook,
-  AiOutlineGoogle,
-  AiOutlineTwitter,
-} from 'react-icons/ai';
+import { AiOutlineFacebook } from 'react-icons/ai';
 import httpClient from '../../../API/httpClient';
-
-import { Link } from 'react-router-dom';
 import { LosTodosContext } from '../../../App';
+import FacebookLogin from 'react-facebook-login/dist/facebook-login-render-props';
 
 const useStyles = makeStyles((theme) => ({
   wrapper: {
@@ -52,26 +47,9 @@ const useStyles = makeStyles((theme) => ({
   },
   facebookBtn: {
     color: '#fff',
-    minWidth: '30%',
     backgroundColor: '#3B5998',
     '&:hover': {
       backgroundColor: '#2F4779',
-    },
-  },
-  twitterBtn: {
-    color: '#fff',
-    minWidth: '30%',
-    backgroundColor: '#00ACEE',
-    '&:hover': {
-      backgroundColor: '#0089BE',
-    },
-  },
-  googleBtn: {
-    color: '#fff',
-    minWidth: '30%',
-    backgroundColor: '#F44336',
-    '&:hover': {
-      backgroundColor: '#C3352B',
     },
   },
   form: {
@@ -126,6 +104,27 @@ const Login = () => {
   const [accessError, setAccessError] = useState('');
 
   const { login } = useContext(LosTodosContext);
+
+  const handleFacebookLogin = async (response) => {
+    try {
+      const resource = {
+        accessToken: response.accessToken,
+      };
+      const user = await httpClient.User.facebookLogin(resource);
+      login(user);
+    } catch (error) {
+      console.log(error);
+      if (error.response) {
+        setAccessError(
+          `Błąd: ${error.response.status}. ${error.response.data}`
+        );
+      } else if (error.request) {
+        setAccessError('Błąd: Nie udało się wysłać żądania. Spróbuj ponownie');
+      } else {
+        setAccessError('Wystąpił nieoczekiwany błąd. Spróbuj ponownie');
+      }
+    }
+  };
 
   const handleLogin = async () => {
     const emailRegEx = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
@@ -266,27 +265,23 @@ const Login = () => {
               Zaloguj
             </Button>
           </form>
-          <Link style={{ color: '#fff', marginTop: 20 }} to='/register'>
-            Zarejestruj się
-          </Link>
-          <Link style={{ color: '#fff' }} to='/forget/password'>
-            Zapomniałem hasła
-          </Link>
-          <Grid
-            item
-            container
-            justify='space-between'
-            style={{ marginTop: 20 }}
-          >
-            <Button className={styles.facebookBtn} variant='contained'>
-              <AiOutlineFacebook size='1.5rem' />
-            </Button>
-            <Button className={styles.googleBtn} variant='contained'>
-              <AiOutlineGoogle size='1.5rem' />
-            </Button>
-            <Button className={styles.twitterBtn} variant='contained'>
-              <AiOutlineTwitter size='1.5rem' />
-            </Button>
+          <Grid container item style={{ marginTop: 20 }}>
+            <FacebookLogin
+              appId='5102215729852842'
+              callback={handleFacebookLogin}
+              fields='name,email,picture'
+              render={(renderProps) => (
+                <Button
+                  fullWidth
+                  onClick={renderProps.onClick}
+                  className={styles.facebookBtn}
+                  variant='contained'
+                  startIcon={<AiOutlineFacebook size='1.5rem' />}
+                >
+                  Zaloguj / Zarejestruj się za pomocą facebooka
+                </Button>
+              )}
+            />
           </Grid>
         </Grid>
       </Grid>

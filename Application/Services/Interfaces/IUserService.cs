@@ -7,6 +7,7 @@ namespace Application.Services.Interfaces
     public interface IUserService
     {
          Task<Response<LoggedUser>> Login(UserCredentials credentials);
+         Task<Response<LoggedUser>> FacebookLogin(string accessToken);
          Task<Response<LoggedUser>> Register(RegisterCredentials credentials, string userRole);
          Task<Response<UpdateUser>> UpdateUserDataAsync(UpdateUser updateUser);
          Task<Response<LoggedUser>> GetCurrentUser();
