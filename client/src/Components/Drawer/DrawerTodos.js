@@ -80,23 +80,8 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const DrawerTodos = () => {
+const DrawerTodos = ({ groupedTodos, removeEntry }) => {
   const styles = useStyles();
-  const [groupedTodos, setGroupedTodos] = useState({});
-  const { myTodoLists, removeTodoList } = useContext(LosTodosContext);
-
-  useEffect(() => {
-    setGroupedTodos(groupByDate(myTodoLists));
-  }, [myTodoLists]);
-
-  const removeEntry = async (todo) => {
-    try {
-      await httpClient.TaskSets.remove(todo.id);
-      removeTodoList(todo.id);
-    } catch (e) {
-      console.log(e);
-    }
-  };
 
   return (
     <Grid container item className={styles.root}>

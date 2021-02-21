@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import {
   makeStyles,
   Grid,
@@ -12,6 +12,9 @@ import DrawerSearch from './DrawerSearch';
 import DrawerTodos from './DrawerTodos';
 import HomeIcon from '@material-ui/icons/Home';
 import { Link, useLocation } from 'react-router-dom';
+import { LosTodosContext } from '../../App';
+import { groupByDate } from '../../Helpers/Helpers';
+import httpClient from '../../API/httpClient';
 
 const useStyles = makeStyles((theme) => ({
   root: {},
@@ -48,6 +51,62 @@ const Drawer = ({ toggledOnMobile, setToggledOnMobile }) => {
   const styles = useStyles();
   const location = useLocation();
 
+  const [groupedTodos, setGroupedTodos] = useState({});
+  const { myTodoLists, removeTodoList } = useContext(LosTodosContext);
+  const [filteredTodos, setFilteredTodos] = useState([]);
+  const [sortType, setSortType] = useState('date');
+  const [sortContent, setSortContent] = useState('');
+
+  useEffect(() => {
+    setFilteredTodos(myTodoLists);
+  }, [myTodoLists]);
+
+  useEffect(() => {
+    setGroupedTodos(groupByDate(filteredTodos));
+  }, [filteredTodos]);
+
+  const removeEntry = async (todo) => {
+    try {
+      await httpClient.TaskSets.remove(todo.id);
+      removeTodoList(todo.id);
+      setSortType('date');
+      setSortContent('');
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const filterTodos = () => {
+    let filtered = [];
+    if (sortContent === '') {
+      setFilteredTodos(myTodoLists);
+    } else {
+      switch (sortType) {
+        case 'date':
+          filtered = myTodoLists.filter(
+            (p) =>
+              p.created.includes(sortContent) ||
+              p.lastModified.includes(sortContent)
+          );
+          setFilteredTodos(filtered);
+          break;
+        case 'tag':
+          filtered = myTodoLists.filter(
+            (p) => p.tags.filter((t) => t.name === sortContent).length > 0
+          );
+          setFilteredTodos(filtered);
+          break;
+        case 'title':
+          filtered = myTodoLists.filter((p) => p.name.includes(sortContent));
+          setFilteredTodos(filtered);
+          break;
+        default:
+          setFilteredTodos(myTodoLists);
+          break;
+      }
+    }
+  };
+
   return (
     <Grid container className={styles.root}>
       <Grid item>
@@ -64,9 +123,18 @@ const Drawer = ({ toggledOnMobile, setToggledOnMobile }) => {
               keepMounted: true,
             }}
           >
-            <DrawerSearch />
+            <DrawerSearch
+              sortContent={sortContent}
+              setSortContent={setSortContent}
+              sortType={sortType}
+              setSortType={setSortType}
+              filterTodos={filterTodos}
+            />
             <Divider className={styles.divider} />
-            <DrawerTodos />
+            <DrawerTodos
+              removeEntry={removeEntry}
+              groupedTodos={groupedTodos}
+            />
             {location.pathname !== '/' ? (
               <Button
                 className={styles.backToAddTodo}
@@ -94,9 +162,18 @@ const Drawer = ({ toggledOnMobile, setToggledOnMobile }) => {
             }}
           >
             <Toolbar />
-            <DrawerSearch />
+            <DrawerSearch
+              sortContent={sortContent}
+              setSortContent={setSortContent}
+              sortType={sortType}
+              setSortType={setSortType}
+              filterTodos={filterTodos}
+            />
             <Divider className={styles.divider} />
-            <DrawerTodos />
+            <DrawerTodos
+              removeEntry={removeEntry}
+              groupedTodos={groupedTodos}
+            />
             {location.pathname !== '/' ? (
               <Button
                 className={styles.backToAddTodo}

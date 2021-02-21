@@ -73,7 +73,13 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const DrawerSearch = () => {
+const DrawerSearch = ({
+  sortContent,
+  setSortContent,
+  sortType,
+  setSortType,
+  filterTodos,
+}) => {
   const styles = useStyles();
 
   return (
@@ -90,12 +96,20 @@ const DrawerSearch = () => {
             variant='outlined'
             label='Szukaj'
             type='text'
+            value={sortContent}
+            onChange={(e) => {
+              setSortContent(e.target.value);
+            }}
             placeholder='Szukaj TODO/ TODO Listy'
           />
           <Button
             type='submit'
             style={{ backgroundColor: 'white' }}
             variant='contained'
+            onClick={(e) => {
+              e.preventDefault();
+              filterTodos();
+            }}
           >
             <SearchIcon style={{ color: '#760D0D' }} />
           </Button>
@@ -103,27 +117,28 @@ const DrawerSearch = () => {
         <Grid container>
           <FormControl component='fieldset' style={{ width: '100%' }}>
             <RadioGroup
-              aria-label='gender'
-              name='gender1'
-              value={'female'}
-              onChange={() => {}}
+              name='sortingTypes'
+              value={sortType}
+              onChange={(e, value) => {
+                setSortType(value);
+              }}
               className={styles.radioGroup}
               style={{ flexDirection: 'row', justifyContent: 'center' }}
             >
               <FormControlLabel
-                value='female'
+                value='date'
                 className={styles.radioLabel}
                 control={<Radio />}
                 label='Po dacie'
               />
               <FormControlLabel
-                value='male'
+                value='tag'
                 className={styles.radioLabel}
                 control={<Radio />}
                 label='Po tagu'
               />
               <FormControlLabel
-                value='other'
+                value='title'
                 className={styles.radioLabel}
                 control={<Radio />}
                 label='Po tytule'

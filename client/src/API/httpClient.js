@@ -47,6 +47,8 @@ const User = {
   login: (user) => requests.post('/users/login', user),
   currentUser: () => requests.get('/users'),
   update: (user) => requests.put('/users', user),
+  facebookLogin: (accessToken) =>
+    requests.post('/users/login/facebook', accessToken),
 };
 
 export default {
