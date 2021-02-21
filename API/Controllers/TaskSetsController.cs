@@ -6,6 +6,7 @@ using Application.Resources.TaskSet;
 using Application.Services.Interfaces;
 using AutoMapper;
 using Domain.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
@@ -23,6 +24,7 @@ namespace API.Controllers
             this.mapper = mapper;
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> GetAllAsync() 
         {
@@ -31,6 +33,21 @@ namespace API.Controllers
             return Ok(taskSetsResource);
         }
 
+        [Authorize(Roles = "Admin,RegularUser")]
+        [HttpGet("my")]
+        public async Task<IActionResult> GetAllForUserAsync(){
+            var taskSets = await taskSetService.GetAllForUserAsync();
+
+            if(!taskSets.Success){
+                return BadRequest(taskSets.Message);
+            }
+
+            var resource = mapper.Map<List<TaskSet>, List<MyTaskSetResource>>(taskSets.Value);
+
+            return Ok(resource);
+        }
+
+        [Authorize(Roles = "Admin,RegularUser")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetAsync(Guid id)
         {
@@ -44,6 +61,7 @@ namespace API.Controllers
             return Ok(taskSetResource);
         }
 
+        [Authorize(Roles = "Admin,RegularUser")]
         [HttpPost]
         public async Task<IActionResult> SaveAsync([FromBody] SaveTaskSetResource resource) 
         {
@@ -58,9 +76,11 @@ namespace API.Controllers
                 return BadRequest(response.Message);
             }
 
-            return NoContent();
+            return Ok(response.Value.Id);
         }
 
+
+        [Authorize(Roles = "Admin,RegularUser")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateAsync([FromBody] SaveTaskSetResource resource, Guid id)
         {
@@ -75,9 +95,10 @@ namespace API.Controllers
                 return BadRequest(response.Message);
             }
 
-            return NoContent();
+            return Ok(response.Value.Id);
         }
 
+        [Authorize(Roles = "Admin,RegularUser")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAsync(Guid id){
             var response = await taskSetService.DeleteAsync(id);

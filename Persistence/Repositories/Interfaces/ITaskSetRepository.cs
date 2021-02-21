@@ -9,7 +9,9 @@ namespace Persistence.Repositories.Interfaces
     {
          System.Threading.Tasks.Task<List<TaskSet>> GetAllAsync();
          System.Threading.Tasks.Task<TaskSet> GetAsync(Guid id);
+         System.Threading.Tasks.Task<List<TaskSet>> GetAllForUserAsync(string id);
          System.Threading.Tasks.Task<TaskSet> SearchAsync(Guid id);
+         System.Threading.Tasks.Task<TaskSet> SearchByNameAsync(string name);
          System.Threading.Tasks.Task SaveAsync(TaskSet taskSet);
          void Update(TaskSet taskSet);
          void Delete(TaskSet taskSet);

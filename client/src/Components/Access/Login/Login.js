@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import {
   Grid,
@@ -6,15 +6,19 @@ import {
   TextField,
   Button,
   InputAdornment,
+  Snackbar,
 } from '@material-ui/core';
 import { Face, LockOpen } from '@material-ui/icons';
+import { Alert } from '@material-ui/lab';
 import {
   AiOutlineFacebook,
   AiOutlineGoogle,
   AiOutlineTwitter,
 } from 'react-icons/ai';
+import httpClient from '../../../API/httpClient';
 
 import { Link } from 'react-router-dom';
+import { LosTodosContext } from '../../../App';
 
 const useStyles = makeStyles((theme) => ({
   wrapper: {
@@ -46,23 +50,25 @@ const useStyles = makeStyles((theme) => ({
   textFieldLabel: {
     color: '#fff',
   },
-  socialBtn: {
+  facebookBtn: {
     color: '#fff',
     minWidth: '30%',
-  },
-  facebookBtn: {
     backgroundColor: '#3B5998',
     '&:hover': {
       backgroundColor: '#2F4779',
     },
   },
   twitterBtn: {
+    color: '#fff',
+    minWidth: '30%',
     backgroundColor: '#00ACEE',
     '&:hover': {
       backgroundColor: '#0089BE',
     },
   },
   googleBtn: {
+    color: '#fff',
+    minWidth: '30%',
     backgroundColor: '#F44336',
     '&:hover': {
       backgroundColor: '#C3352B',
@@ -110,129 +116,181 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Login = ({ setLogged }) => {
+const Login = () => {
   const styles = useStyles();
 
-  const [email, setEmail] = useState(null);
-  const [password, setPassword] = useState(null);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [accessError, setAccessError] = useState('');
 
-  const login = () => {
-    if (email !== null && password !== null) {
-      setLogged(true);
+  const { login } = useContext(LosTodosContext);
+
+  const handleLogin = async () => {
+    const emailRegEx = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+    const passwordRegEx = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/;
+
+    if (!email.match(emailRegEx)) {
+      setEmailError('Niepoprawna struktura adresu e-mail');
+      return;
+    }
+
+    if (!password.match(passwordRegEx)) {
+      setPasswordError('Niepoprawna struktura hasła');
+      return;
+    }
+
+    const credentials = {
+      email: email,
+      password: password,
+    };
+
+    try {
+      const user = await httpClient.User.login(credentials);
+      login(user);
+    } catch (error) {
+      if (error.response) {
+        setAccessError(
+          `Błąd: ${error.response.status}. ${error.response.data}`
+        );
+      } else if (error.request) {
+        setAccessError('Błąd: Nie udało się wysłać żądania. Spróbuj ponownie');
+      } else {
+        setAccessError('Wystąpił nieoczekiwany błąd. Spróbuj ponownie');
+      }
     }
   };
 
   return (
-    <Grid
-      className={styles.wrapper}
-      justify='center'
-      alignItems='center'
-      container
-    >
-      <Grid
-        item
-        xs={12}
-        sm={8}
-        md={4}
-        container
-        justify='center'
-        direction='column'
-        className={styles.loginContainer}
+    <>
+      <Snackbar
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+        open={accessError !== ''}
+        autoHideDuration={3000}
+        onClose={() => setAccessError('')}
       >
-        <img
-          className={styles.logo}
-          src='/assets/img/logo.svg'
-          alt='LosTodosLogo'
-        />
-        <Typography variant='h3' className={styles.heading} align='center'>
-          Los Todos
-        </Typography>
-        <Typography variant='h5' className={styles.subheading} align='center'>
-          System porządkowania Twojego dnia!
-        </Typography>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            login();
-          }}
-          className={styles.form}
-          autoComplete='off'
+        <Alert variant='filled' severity='warning'>
+          {accessError}
+        </Alert>
+      </Snackbar>
+      <Grid
+        className={styles.wrapper}
+        justify='center'
+        alignItems='center'
+        container
+      >
+        <Grid
+          item
+          xs={12}
+          sm={8}
+          md={4}
+          container
+          justify='center'
+          direction='column'
+          className={styles.loginContainer}
         >
-          <TextField
-            className={styles.textField}
-            InputLabelProps={{
-              className: styles.textFieldLabel,
-            }}
-            fullWidth
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position='start'>
-                  <Face />
-                </InputAdornment>
-              ),
-            }}
-            type='e-mail'
-            placeholder='Wprowadź adres e-mail'
-            label='Adres e-mail'
-            variant='outlined'
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
+          <img
+            className={styles.logo}
+            src='/assets/img/logo.svg'
+            alt='LosTodosLogo'
           />
-          <TextField
-            color='#fff'
-            className={styles.textField}
-            InputLabelProps={{
-              className: styles.textFieldLabel,
+          <Typography variant='h3' className={styles.heading} align='center'>
+            Los Todos
+          </Typography>
+          <Typography variant='h5' className={styles.subheading} align='center'>
+            System porządkowania Twojego dnia!
+          </Typography>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleLogin();
             }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position='start'>
-                  <LockOpen />
-                </InputAdornment>
-              ),
-            }}
-            fullWidth
-            type='password'
-            placeholder='Wprowadź hasło'
-            label='Hasło'
-            variant='outlined'
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          <Button type='submit' variant='contained' className={styles.loginBtn}>
-            Zaloguj
-          </Button>
-        </form>
-        <Link style={{ color: '#fff', marginTop: 20 }} to='/register'>
-          Zarejestruj się
-        </Link>
-        <Link style={{ color: '#fff' }} to='/forget/password'>
-          Zapomniałem hasła
-        </Link>
-        <Grid item container justify='space-between' style={{ marginTop: 20 }}>
-          <Button
-            className={[styles.socialBtn, styles.facebookBtn]}
-            variant='contained'
+            className={styles.form}
+            autoComplete='off'
           >
-            <AiOutlineFacebook size='1.5rem' />
-          </Button>
-          <Button
-            className={[styles.socialBtn, styles.googleBtn]}
-            variant='contained'
+            <TextField
+              className={styles.textField}
+              InputLabelProps={{
+                className: styles.textFieldLabel,
+              }}
+              fullWidth
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position='start'>
+                    <Face />
+                  </InputAdornment>
+                ),
+              }}
+              type='e-mail'
+              placeholder='Wprowadź adres e-mail'
+              error={emailError !== '' ? true : false}
+              helperText={emailError}
+              label='Adres e-mail'
+              variant='outlined'
+              value={email}
+              onFocus={() => setEmailError('')}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+            <TextField
+              className={styles.textField}
+              InputLabelProps={{
+                className: styles.textFieldLabel,
+              }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position='start'>
+                    <LockOpen />
+                  </InputAdornment>
+                ),
+              }}
+              fullWidth
+              type='password'
+              placeholder='Wprowadź hasło'
+              label='Hasło'
+              variant='outlined'
+              error={passwordError !== '' ? true : false}
+              helperText={passwordError}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              onFocus={() => setPasswordError('')}
+              required
+            />
+            <Button
+              type='submit'
+              variant='contained'
+              disabled={email === '' || password === ''}
+              className={styles.loginBtn}
+            >
+              Zaloguj
+            </Button>
+          </form>
+          <Link style={{ color: '#fff', marginTop: 20 }} to='/register'>
+            Zarejestruj się
+          </Link>
+          <Link style={{ color: '#fff' }} to='/forget/password'>
+            Zapomniałem hasła
+          </Link>
+          <Grid
+            item
+            container
+            justify='space-between'
+            style={{ marginTop: 20 }}
           >
-            <AiOutlineGoogle size='1.5rem' />
-          </Button>
-          <Button
-            className={[styles.socialBtn, styles.twitterBtn]}
-            variant='contained'
-          >
-            <AiOutlineTwitter size='1.5rem' />
-          </Button>
+            <Button className={styles.facebookBtn} variant='contained'>
+              <AiOutlineFacebook size='1.5rem' />
+            </Button>
+            <Button className={styles.googleBtn} variant='contained'>
+              <AiOutlineGoogle size='1.5rem' />
+            </Button>
+            <Button className={styles.twitterBtn} variant='contained'>
+              <AiOutlineTwitter size='1.5rem' />
+            </Button>
+          </Grid>
         </Grid>
       </Grid>
-    </Grid>
+    </>
   );
 };
 

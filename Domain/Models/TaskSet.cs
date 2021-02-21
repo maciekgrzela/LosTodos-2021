@@ -11,6 +11,8 @@ namespace Domain.Models
         public Guid Id {get; set;}
         [Required, StringLength(200, MinimumLength = 3)]
         public string Name {get; set;}
+        public AppUser Owner {get; set;}
+        public string OwnerId {get; set;}
         public ICollection<Task> Tasks {get; set;}
         public ICollection<TaskSetTags> TaskSetTags {get; set; }
     }

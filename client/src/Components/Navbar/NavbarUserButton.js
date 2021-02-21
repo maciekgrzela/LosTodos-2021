@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import {
   makeStyles,
   Grid,
@@ -11,6 +11,8 @@ import {
 } from '@material-ui/core';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import { AiOutlineLogout, AiOutlineUser } from 'react-icons/ai';
+import { LosTodosContext } from '../../App';
+import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
   root: {},
@@ -31,8 +33,9 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const NavbarUserButton = ({ setLogged, user }) => {
+const NavbarUserButton = () => {
   const styles = useStyles();
+  const { user, login } = useContext(LosTodosContext);
   const [userMenuAnchorElement, setUserMenuAnchorElement] = useState(null);
 
   return (
@@ -49,10 +52,11 @@ const NavbarUserButton = ({ setLogged, user }) => {
           variant='contained'
         >
           <Avatar
-            style={{ marginRight: 10 }}
+            style={{ marginRight: 10, backgroundColor: '#FD3F3F' }}
             alt={`${user.firstName} ${user.lastName}`}
-            src='https://randomuser.me/api/portraits/men/75.jpg'
-          />
+          >
+            {`${user.firstName.substr(0, 1)}${user.lastName.substr(0, 1)}`}
+          </Avatar>
           <Typography>
             {user.firstName} {user.lastName}
           </Typography>
@@ -75,11 +79,16 @@ const NavbarUserButton = ({ setLogged, user }) => {
             <ListItemIcon>
               <AiOutlineUser />
             </ListItemIcon>
-            <Typography variant='inherit'>Moje konto</Typography>
+            <Link
+              style={{ textDecoration: 'none', color: '#000' }}
+              to={{ pathname: '/me' }}
+            >
+              <Typography variant='inherit'>Moje konto</Typography>
+            </Link>
           </MenuItem>
           <MenuItem
             onClick={() => {
-              setLogged(false);
+              login(null);
             }}
           >
             <ListItemIcon>
