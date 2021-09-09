@@ -1,5 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Application.Responses;
@@ -116,7 +117,7 @@ namespace Application.Services
 
         public async Task<Response<LoggedUser>> Login(UserCredentials credentials)
         {
-            var user = await userManager.FindByEmailAsync(credentials.Email);
+            var user = await userManager.Users.FirstOrDefaultAsync(p => p.Email == credentials.Email && !p.UserName.StartsWith("fb"));
 
             if (user == null)
             {
@@ -127,24 +128,24 @@ namespace Application.Services
 
             var userRoles = await userManager.GetRolesAsync(user);
 
-            if (result.Succeeded)
+            if (!result.Succeeded) 
+                return new Response<LoggedUser>("Dane uwierzytelniające są nieprawidłowe");
+            
+            
+            var loggedUser = new LoggedUser()
             {
-                var loggedUser = new LoggedUser()
-                {
-                    Id = user.Id,
-                    FirstName = user.FirstName,
-                    LastName = user.LastName,
-                    DateOfBirth = user.DateOfBirth,
-                    UserName = user.UserName,
-                    PhoneNumber = user.PhoneNumber,
-                    Email = user.Email,
-                    Token = webTokenGenerator.CreateToken(user, userRoles[0])
-                };
+                Id = user.Id,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                DateOfBirth = user.DateOfBirth,
+                UserName = user.UserName,
+                PhoneNumber = user.PhoneNumber,
+                Email = user.Email,
+                Token = webTokenGenerator.CreateToken(user, userRoles[0])
+            };
 
-                return new Response<LoggedUser>(loggedUser);
-            }
+            return new Response<LoggedUser>(loggedUser);
 
-            return new Response<LoggedUser>("Dane uwierzytelniające są nieprawidłowe");
         }
 
         public async Task<Response<LoggedUser>> Register(RegisterCredentials credentials, string userRole)
