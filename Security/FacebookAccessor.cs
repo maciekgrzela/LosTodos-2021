@@ -33,7 +33,7 @@ namespace Security
                 return null;
             }
 
-            var result = await GetAsync<FacebookUserInfo>(accessToken, "me", "fields=name,email,picture.width(100).height(100)");
+            var result = await GetAsync<FacebookUserInfo>(accessToken, "me", "fields=name,email,birthday,picture.width(100).height(100)");
             return result;
         }
 

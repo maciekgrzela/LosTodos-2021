@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Domain.Models
@@ -8,6 +9,7 @@ namespace Domain.Models
         public string Id { get; set; }
         public string Name { get; set; }
         public string Email { get; set; }
+        public string Birthday { get; set; }
         public FacebookPictureData Picture { get; set; }
     }
 

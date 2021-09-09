@@ -104,9 +104,8 @@ const useStyles = makeStyles(() => ({
 const ShowTodo = () => {
   let { id } = useParams();
 
-  const { myTodoLists, updateMyTodo, removeTodo, addTodo } = useContext(
-    LosTodosContext
-  );
+  const { myTodoLists, updateMyTodo, removeTodo, addTodo } =
+    useContext(LosTodosContext);
   const [todoList, setTodoList] = useState(null);
   const [addedTodo, setAddedTodo] = useState('');
 
@@ -228,26 +227,29 @@ const ShowTodo = () => {
               <Typography style={{ marginRight: 10 }} variant='h5'>
                 Tagi:
               </Typography>
-              {todoList !== null ? (
-                todoList.tags.map((tag) => (
-                  <Link
-                    style={{
-                      textDecoration: 'none',
-                      marginLeft: 5,
-                      marginRight: 5,
-                    }}
-                    to={{ pathname: `/tag/${tag.id}` }}
-                  >
-                    <Chip
-                      style={{ cursor: 'pointer' }}
-                      avatar={<Avatar>#</Avatar>}
-                      label={tag.name}
-                    />
-                  </Link>
-                ))
-              ) : (
-                <Typography>Brak informacji</Typography>
-              )}
+              <Grid container>
+                {todoList !== null ? (
+                  todoList.tags.map((tag) => (
+                    <Link
+                      style={{
+                        textDecoration: 'none',
+                        marginLeft: 5,
+                        marginRight: 5,
+                        marginBottom: 5,
+                      }}
+                      to={{ pathname: `/tag/${tag.id}` }}
+                    >
+                      <Chip
+                        style={{ cursor: 'pointer' }}
+                        avatar={<Avatar>#</Avatar>}
+                        label={tag.name}
+                      />
+                    </Link>
+                  ))
+                ) : (
+                  <Typography>Brak informacji</Typography>
+                )}
+              </Grid>
             </Grid>
             <Grid
               container

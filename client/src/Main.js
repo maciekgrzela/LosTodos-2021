@@ -2,7 +2,6 @@ import React, { useContext } from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import Dashboard from './Components/Dashboard';
 import Login from './Components/Access/Login/Login';
-import Register from './Components/Access/Register/Register';
 import ForgetPassword from './Components/Access/ForgetPassword/ForgetPassword';
 import { LosTodosContext } from './App';
 
@@ -20,9 +19,6 @@ const Main = () => {
       </Route>
       <Route exact path='/login'>
         {user !== null ? <Redirect to={{ pathname: '/' }} /> : <Login />}
-      </Route>
-      <Route exact path='/register'>
-        {user !== null ? <Redirect to={{ pathname: '/' }} /> : <Register />}
       </Route>
       <Route exact path='/forget/password'>
         {user !== null ? (

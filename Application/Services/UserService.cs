@@ -48,7 +48,7 @@ namespace Application.Services
                     LastName = userInfo.Name.Split(' ', 2)[1],
                     Email = userInfo.Email,
                     UserName = "fb_" + userInfo.Id,
-                    DateOfBirth = DateTime.Now,
+                    DateOfBirth = userInfo.Birthday == null ? DateTime.Now : DateTime.Parse(userInfo.Birthday),
                     PhotoUrl = userInfo.Picture.Data.Url,
                     Tags = new Collection<Tag>(),
                     TaskSets = new Collection<TaskSet>(),
@@ -58,7 +58,7 @@ namespace Application.Services
 
                 if(!result.Succeeded)
                 {
-                    return new Response<LoggedUser>("Nie udało się utworzyć konta użytkownika dla podanych informacjiA");
+                    return new Response<LoggedUser>("Nie udało się utworzyć konta użytkownika dla podanych informacji");
                 }
 
                 await userManager.AddToRoleAsync(user, "RegularUser");

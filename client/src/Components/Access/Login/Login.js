@@ -111,6 +111,7 @@ const Login = () => {
         accessToken: response.accessToken,
       };
       const user = await httpClient.User.facebookLogin(resource);
+      console.log('Facebook users data: ', user);
       login(user);
     } catch (error) {
       console.log(error);
@@ -127,8 +128,10 @@ const Login = () => {
   };
 
   const handleLogin = async () => {
-    const emailRegEx = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
-    const passwordRegEx = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/;
+    const emailRegEx =
+      /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+    const passwordRegEx =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/;
 
     if (!email.match(emailRegEx)) {
       setEmailError('Niepoprawna struktura adresu e-mail');
@@ -269,7 +272,7 @@ const Login = () => {
             <FacebookLogin
               appId='5102215729852842'
               callback={handleFacebookLogin}
-              fields='name,email,picture'
+              fields='name,email,birthday,picture'
               render={(renderProps) => (
                 <Button
                   fullWidth
@@ -278,7 +281,7 @@ const Login = () => {
                   variant='contained'
                   startIcon={<AiOutlineFacebook size='1.5rem' />}
                 >
-                  Zaloguj / Zarejestruj się za pomocą facebooka
+                  Zaloguj się za pomocą facebooka
                 </Button>
               )}
             />
