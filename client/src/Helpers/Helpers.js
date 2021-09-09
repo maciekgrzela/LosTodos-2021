@@ -1,5 +1,5 @@
-const groupByDate = (array) => {
-  let result = array.reduce((object, arrayElement) => {
+function groupByDate(array) {
+  return array.reduce((object, arrayElement) => {
     object[arrayElement['created'].substr(0, 10)] =
       object[arrayElement['created'].substr(0, 10)] === undefined
         ? []
@@ -8,13 +8,10 @@ const groupByDate = (array) => {
     object[arrayElement['created'].substr(0, 10)].push(arrayElement);
     return object;
   }, {});
-
-  return result;
-};
+}
 
 const sortByDate = (array) => {
-  let result = array.sort((a, b) => new Date(b.created) - new Date(a.created));
-  return result;
+  return array.sort((a, b) => new Date(b.created) - new Date(a.created));
 };
 
 export { groupByDate, sortByDate };
