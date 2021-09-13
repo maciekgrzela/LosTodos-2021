@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  makeStyles,
-  Grid,
-  Breadcrumbs,
-  Link,
-  Typography,
-} from '@material-ui/core';
+import { makeStyles, Grid, Breadcrumbs, Typography } from '@material-ui/core';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 
 const useStyles = makeStyles((theme) => ({
@@ -35,10 +29,7 @@ const NavbarBreadcrumb = () => {
           aria-label='breadcrumb'
           className={styles.breadcrumbs}
         >
-          <Link color='inherit' href='/' onClick={() => {}}>
-            Jesteś tutaj
-          </Link>
-          <Typography>Strona Główna</Typography>
+          <Typography>Zwiększaj swoją produktywność każdego dnia!</Typography>
         </Breadcrumbs>
       </Grid>
     </Grid>

@@ -10,7 +10,6 @@ import {
 import CheckmarkAnimation from '../Animation/CheckmarkAnimation';
 import PlaylistAddIcon from '@material-ui/icons/PlaylistAdd';
 import PlaylistAddCheckIcon from '@material-ui/icons/PlaylistAddCheck';
-import TimelineIcon from '@material-ui/icons/Timeline';
 import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles(() => ({

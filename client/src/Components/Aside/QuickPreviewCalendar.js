@@ -16,9 +16,10 @@ const useStyles = makeStyles((theme) => ({
     '& .react-calendar__month-view__days__day': {
       fontFamily: 'Bahnschrift, Signika, sans-serif',
     },
-    '& .react-calendar__tile:enabled:hover, .react-calendar__tile:enabled:focus': {
-      backgroundColor: '#ccc',
-    },
+    '& .react-calendar__tile:enabled:hover, .react-calendar__tile:enabled:focus':
+      {
+        backgroundColor: '#ccc',
+      },
     '& .react-calendar__tile': {
       borderRadius: 30,
     },
@@ -48,7 +49,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const AsideCalendar = () => {
+const QuickPreviewCalendar = () => {
   const styles = useStyles();
   const [currentDate, setCurrentDate] = useState(new Date());
   const history = useHistory();
@@ -73,4 +74,4 @@ const AsideCalendar = () => {
   );
 };
 
-export default AsideCalendar;
+export default QuickPreviewCalendar;

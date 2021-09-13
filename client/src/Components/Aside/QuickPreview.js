@@ -1,28 +1,28 @@
 import React from 'react';
 import { makeStyles, Grid } from '@material-ui/core';
-import AsideCalendar from './AsideCalendar';
-import AsideStats from './AsideStats';
-import AsideTags from './AsideTags';
+import QuickPreviewCalendar from './QuickPreviewCalendar';
+import QuickPreviewTags from './QuickPreviewTags';
+import QuickPreviewStats from './QuickPreviewStats';
 
 const useStyles = makeStyles((theme) => ({
   root: {},
 }));
 
-const Aside = () => {
+const QuickPreview = () => {
   const styles = useStyles();
   return (
     <Grid container item className={styles.root}>
       <Grid item>
-        <AsideCalendar />
+        <QuickPreviewCalendar />
       </Grid>
       <Grid item>
-        <AsideTags />
+        <QuickPreviewTags />
       </Grid>
       <Grid item>
-        <AsideStats />
+        <QuickPreviewStats />
       </Grid>
     </Grid>
   );
 };
 
-export default Aside;
+export default QuickPreview;

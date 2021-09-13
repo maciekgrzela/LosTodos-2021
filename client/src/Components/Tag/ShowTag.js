@@ -56,10 +56,10 @@ const ShowTag = () => {
         <Divider />
         {currentTag !== null ? (
           <List className={styles.list}>
-            {currentTag.taskSets.map((taskSet) => (
+            {currentTag.todoSets.map((todoSet) => (
               <Link
                 style={{ textDecoration: 'none', color: '#000' }}
-                to={{ pathname: `/edit/${taskSet.id}` }}
+                to={{ pathname: `/edit/${todoSet.id}` }}
               >
                 <ListItem>
                   <ListItemAvatar>
@@ -68,7 +68,7 @@ const ShowTag = () => {
                     </Avatar>
                   </ListItemAvatar>
                   <ListItemText
-                    primary={taskSet.name}
+                    primary={todoSet.name}
                     secondary={`Utworzona: ${new Intl.DateTimeFormat('pl-PL', {
                       year: 'numeric',
                       month: 'long',
@@ -76,7 +76,7 @@ const ShowTag = () => {
                       hour: 'numeric',
                       minute: 'numeric',
                       second: 'numeric',
-                    }).format(new Date(taskSet.created))}`}
+                    }).format(new Date(todoSet.created))}`}
                   />
                 </ListItem>
               </Link>

@@ -71,10 +71,10 @@ const ShowDate = () => {
     );
     const allTodos = [];
     myTodoLists.forEach((list) => {
-      list.tasks.forEach((task) => {
-        task.taskSetId = list.id;
+      list.todos.forEach((todo) => {
+        todo.todoSetId = list.id;
       });
-      allTodos.push(...list.tasks);
+      allTodos.push(...list.todos);
     });
     setCheckedTodos(
       allTodos.filter(
@@ -106,7 +106,7 @@ const ShowDate = () => {
             {checkedTodos.map((todo) => (
               <Link
                 style={{ textDecoration: 'none', color: '#000' }}
-                to={{ pathname: `/edit/${todo.taskSetId}` }}
+                to={{ pathname: `/edit/${todo.todoSetId}` }}
               >
                 {console.log(todo)}
                 <ListItem>
@@ -145,7 +145,7 @@ const ShowDate = () => {
             {createdTodos.map((todo) => (
               <Link
                 style={{ textDecoration: 'none', color: '#000' }}
-                to={{ pathname: `/edit/${todo.taskSetId}` }}
+                to={{ pathname: `/edit/${todo.todoSetId}` }}
               >
                 <ListItem>
                   <ListItemAvatar>

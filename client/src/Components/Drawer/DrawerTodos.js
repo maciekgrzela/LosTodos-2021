@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React from 'react';
 import {
   makeStyles,
   Grid,
@@ -9,18 +9,12 @@ import {
   List,
   ListItem,
   ListItemText,
-  IconButton,
-  Button,
 } from '@material-ui/core';
 import TodayIcon from '@material-ui/icons/Today';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import AccessAlarmIcon from '@material-ui/icons/AccessAlarm';
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
-import httpClient from '../../API/httpClient';
-import { LosTodosContext } from '../../App';
 import { Link } from 'react-router-dom';
-import { groupByDate } from '../../Helpers/Helpers';
 
 const useStyles = makeStyles((theme) => ({
   root: {},

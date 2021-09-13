@@ -83,31 +83,32 @@ const AddTodo = () => {
     e.preventDefault();
 
     try {
-      const todoListResource = {
+      const created = await httpClient.TodoSets.create({
         name: todoListName,
-      };
-      const todoListCreated = await httpClient.TaskSets.create(
-        todoListResource
-      );
+      });
+      console.log('CREATED: ', created);
+      const myTodoSets = await httpClient.TodoSets.myTodoSets();
+      console.log('TODO SETS LOADED: ', myTodoSets);
       const tagsForTodoResource = {
-        taskSetId: todoListCreated,
+        todoSetId: myTodoSets[0].id,
         tags: selectedTags,
       };
-      await httpClient.Tags.addToTaskSet(tagsForTodoResource);
+      console.log('TAGSforTODOresource', tagsForTodoResource);
+      await httpClient.Tags.addToTodoSet(tagsForTodoResource);
 
       const todosResource = [];
       todos.forEach((todo) => {
         todosResource.push({
           name: todo,
           checked: false,
-          taskSetId: todoListCreated,
+          todoSetId: myTodoSets[0].id,
         });
       });
 
-      await httpClient.Tasks.addMultiple(todosResource);
+      await httpClient.Todos.addMultiple(todosResource);
       setResult({
         status: 'ok',
-        info: todoListCreated,
+        info: myTodoSets[0].id,
       });
       fetchMyData();
     } catch (error) {
@@ -223,7 +224,7 @@ const AddTodo = () => {
                           addAnotherTodo();
                         }
                       }}
-                      style={{ flexBasis: '80%' }}
+                      style={{ flexBasis: '70%' }}
                       autoComplete={false}
                       label='Zadanie'
                       placeholder='Wprowadź opis zadania'

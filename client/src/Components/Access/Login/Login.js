@@ -67,20 +67,20 @@ const useStyles = makeStyles((theme) => ({
       },
     },
     '& label.Mui-focused': {
-      color: 'white',
+      color: theme.palette.white.main,
     },
     '& .MuiOutlinedInput-root': {
       '& fieldset': {
-        borderColor: 'white',
-        color: 'white',
+        borderColor: theme.palette.white.main,
+        color: theme.palette.white.main,
       },
       '&:hover fieldset': {
-        borderColor: 'white',
-        color: 'white',
+        borderColor: theme.palette.white.main,
+        color: theme.palette.white.main,
       },
       '&.Mui-focused fieldset': {
-        borderColor: 'white',
-        color: 'white',
+        borderColor: theme.palette.white.main,
+        color: theme.palette.white.main,
       },
     },
   },
@@ -111,10 +111,8 @@ const Login = () => {
         accessToken: response.accessToken,
       };
       const user = await httpClient.User.facebookLogin(resource);
-      console.log('Facebook users data: ', user);
       login(user);
     } catch (error) {
-      console.log(error);
       if (error.response) {
         setAccessError(
           `Błąd: ${error.response.status}. ${error.response.data}`

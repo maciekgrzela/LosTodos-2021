@@ -128,10 +128,10 @@ const ShowTodo = () => {
       const resource = {
         name: todo.name,
         checked: !todo.checked,
-        taskSetId: id,
+        todoSetId: id,
       };
-      await httpClient.Tasks.update(resource, todo.id);
-      const updatedTodo = await httpClient.Tasks.get(todo.id);
+      await httpClient.Todos.update(resource, todo.id);
+      const updatedTodo = await httpClient.Todos.get(todo.id);
       updateMyTodo(updatedTodo, id);
     } catch (e) {
       console.log(e);
@@ -140,7 +140,7 @@ const ShowTodo = () => {
 
   const setTodoRemoved = async (todo) => {
     try {
-      await httpClient.Tasks.remove(todo.id);
+      await httpClient.Todos.remove(todo.id);
       removeTodo(todo.id, id);
     } catch (e) {
       console.log(e);
@@ -152,10 +152,10 @@ const ShowTodo = () => {
       const resource = {
         name: addedTodo,
         checked: false,
-        taskSetId: id,
+        todoSetId: id,
       };
-      const newTodoId = await httpClient.Tasks.add(resource);
-      const newTodo = await httpClient.Tasks.get(newTodoId);
+      const newTodoId = await httpClient.Todos.add(resource);
+      const newTodo = await httpClient.Todos.get(newTodoId);
       addTodo(newTodo, id);
     } catch (e) {
       console.log(e);
@@ -263,7 +263,7 @@ const ShowTodo = () => {
             >
               {todoList !== null ? (
                 <>
-                  {todoList.tasks.map((task, index) => (
+                  {todoList.todos.map((todo, index) => (
                     <Grid
                       key={index}
                       container
@@ -278,13 +278,13 @@ const ShowTodo = () => {
                         <Button
                           variant='contained'
                           className={styles.successBtn}
-                          onClick={() => setTodoChecked(task)}
+                          onClick={() => setTodoChecked(todo)}
                         >
                           <CheckCircleOutlineIcon />
                         </Button>
                         <Button
                           variant='contained'
-                          onClick={() => setTodoRemoved(task)}
+                          onClick={() => setTodoRemoved(todo)}
                           color='primary'
                         >
                           <HighlightOffIcon />
@@ -301,8 +301,8 @@ const ShowTodo = () => {
                           type='text'
                           ref={modifiedTodo}
                           fullWidth
-                          className={task.checked ? styles.successInput : ''}
-                          value={task.name}
+                          className={todo.checked ? styles.successInput : ''}
+                          value={todo.name}
                           onChange={(e) => {}}
                           onKeyDown={(e) => {}}
                           autoComplete={false}
@@ -315,7 +315,7 @@ const ShowTodo = () => {
                   ))}
                 </>
               ) : (
-                'Brak tasków :('
+                'Brak todosów :('
               )}
               <Grid
                 container

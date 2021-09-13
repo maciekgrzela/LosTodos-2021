@@ -53,18 +53,15 @@ const MyData = () => {
   const [firstName, setFirstName] = useState(null);
   const [lastName, setLastName] = useState(null);
   const [email, setEmail] = useState(null);
-  const [dateOfBirth, setDateOfBirth] = useState(null);
   const [phoneNumber, setPhoneNumber] = useState(null);
-
   const [validation, setValidation] = useState([]);
-
   const [updateInfo, setUpdateInfo] = useState([]);
 
   const setUserData = useCallback(() => {
+    console.log('USER!!!!', user);
     setFirstName(user.firstName);
     setLastName(user.lastName);
     setEmail(user.email);
-    setDateOfBirth(Date.parse(user.dateOfBirth) < 0 ? null : user.dateOfBirth);
     setPhoneNumber(user.phoneNumber);
     setValidation([]);
   }, [user]);
@@ -74,7 +71,6 @@ const MyData = () => {
       firstName: firstName,
       lastName: lastName,
       email: email,
-      dateOfBirth: dateOfBirth,
       phoneNumber: phoneNumber,
       oldEmail: user.email,
     };
@@ -84,8 +80,7 @@ const MyData = () => {
       setUpdateInfo([
         {
           status: 'ok',
-          text:
-            'Dane użytkownika zostały zaktualizowane pomyślnie. Zmiana widoczna będzie od następnego zalogowania',
+          text: 'Dane użytkownika zostały zaktualizowane pomyślnie. Zmiana widoczna będzie od następnego zalogowania',
         },
       ]);
     } catch (e) {
@@ -270,53 +265,6 @@ const MyData = () => {
             className={styles.myDataContainer}
           >
             <Grid item xs={3} style={{ fontSize: '1.2rem' }}>
-              Data urodzenia:
-            </Grid>
-            <Grid item xs={9}>
-              <TextField
-                fullWidth
-                error={
-                  validation.filter((p) => p.name === 'dateOfBirth').length > 0
-                }
-                helperText={
-                  validation.filter((p) => p.name === 'dateOfBirth')[0]?.text
-                }
-                variant='outlined'
-                type='date'
-                onChange={(e) => {
-                  const selectedDate = new Date(e.target.valueAsDate);
-                  const nowDate = new Date();
-                  if (selectedDate.getDate() > nowDate.getDate()) {
-                    const newValidation = validation.filter(
-                      (p) => p.name !== 'dateOfBirth'
-                    );
-                    const dateOfBirthValidation = {
-                      name: 'dateOfBirth',
-                      text: 'Należy wybrać datę przeszłą',
-                    };
-                    setValidation([...newValidation, dateOfBirthValidation]);
-                  } else {
-                    setValidation(
-                      validation.filter((p) => p.name !== 'dateOfBirth')
-                    );
-                  }
-                  console.log(e.target.value);
-                  setDateOfBirth(e.target.value);
-                }}
-                value={
-                  dateOfBirth !== null ? dateOfBirth.substr(0, 10) : dateOfBirth
-                }
-                className={styles.textField}
-                required
-              />
-            </Grid>
-          </Grid>
-          <Grid
-            container
-            alignItems='center'
-            className={styles.myDataContainer}
-          >
-            <Grid item xs={3} style={{ fontSize: '1.2rem' }}>
               Numer telefonu:
             </Grid>
             <Grid item xs={9}>
@@ -338,8 +286,7 @@ const MyData = () => {
                     );
                     const phoneNumberValidation = {
                       name: 'phoneNumber',
-                      text:
-                        'Zawartość pola posiada nieprawidłową strukturę (Nr. telefonu w formacie: XXX-XXX-XXX)',
+                      text: 'Zawartość pola posiada nieprawidłową strukturę (Nr. telefonu w formacie: XXX-XXX-XXX)',
                     };
                     setValidation([...newValidation, phoneNumberValidation]);
                   } else {
@@ -375,7 +322,6 @@ const MyData = () => {
                 firstName === null ||
                 lastName === null ||
                 email === null ||
-                dateOfBirth === null ||
                 phoneNumber === null
               }
             >

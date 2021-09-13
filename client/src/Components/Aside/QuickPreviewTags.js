@@ -27,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const AsideTags = () => {
+const QuickPreviewTags = () => {
   const styles = useStyles();
 
   const { myTags } = useContext(LosTodosContext);
@@ -35,8 +35,7 @@ const AsideTags = () => {
   const [popularTags, setPopularTags] = useState([]);
 
   useEffect(() => {
-    let tags = myTags.sort((a, b) => b.taskSets.length - a.taskSets.length);
-    console.log(tags);
+    let tags = myTags.sort((a, b) => b.todoSets.length - a.todoSets.length);
     setPopularTags(tags);
   }, [myTags]);
 
@@ -47,9 +46,9 @@ const AsideTags = () => {
       </Typography>
       <Divider className={styles.divider} />
       <Grid container className={styles.list}>
-        {popularTags.map((tag, index) => {
-          if (index < 10) {
-            return (
+        {popularTags.map((tag, index) => (
+          <>
+            {index < 10 ? (
               <Link
                 style={{ textDecoration: 'none' }}
                 to={{ pathname: `/tag/${tag.id}` }}
@@ -57,17 +56,17 @@ const AsideTags = () => {
                 <Chip
                   avatar={<Avatar>#</Avatar>}
                   label={tag.name}
-                  onClick={() => {}}
+                  onClick={(e) => e.preventDefault}
                 />
               </Link>
-            );
-          } else {
-            return <></>;
-          }
-        })}
+            ) : (
+              <></>
+            )}
+          </>
+        ))}
       </Grid>
     </Grid>
   );
 };
 
-export default AsideTags;
+export default QuickPreviewTags;

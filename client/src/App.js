@@ -17,10 +17,7 @@ const App = () => {
     } else {
       localStorage.setItem('jwt', data.token);
       try {
-        const myTagsFetched = await httpClient.Tags.myTags();
-        setMyTags(sortByDate(myTagsFetched));
-        const myTodosFetched = await httpClient.TaskSets.myTaskSets();
-        setMyTodoLists(sortByDate(myTodosFetched));
+        await fetchMyData();
       } catch (error) {
         setMyTags([]);
         setMyTodoLists([]);
@@ -35,7 +32,7 @@ const App = () => {
 
   const fetchMyTodos = async () => {
     try {
-      const myTodosFetched = await httpClient.TaskSets.myTaskSets();
+      const myTodosFetched = await httpClient.TodoSets.myTodoSets();
       setMyTodoLists(sortByDate(myTodosFetched));
     } catch (e) {
       console.log(e);
@@ -51,34 +48,34 @@ const App = () => {
     }
   };
 
-  const updateMyTodo = (updated, taskSetId) => {
-    const updatedTodoList = myTodoLists.filter((p) => p.id === taskSetId);
-    updatedTodoList[0].tasks = updatedTodoList[0].tasks.filter(
+  const updateMyTodo = (updated, todoSetId) => {
+    const updatedTodoList = myTodoLists.filter((p) => p.id === todoSetId);
+    updatedTodoList[0].todos = updatedTodoList[0].todos.filter(
       (p) => p.id !== updated.id
     );
-    updatedTodoList[0].tasks.push(updated);
-    updatedTodoList[0].tasks = sortByDate(updatedTodoList[0].tasks);
-    const remainTodos = myTodoLists.filter((p) => p.id !== taskSetId);
+    updatedTodoList[0].todos.push(updated);
+    updatedTodoList[0].todos = sortByDate(updatedTodoList[0].todos);
+    const remainTodos = myTodoLists.filter((p) => p.id !== todoSetId);
     const newUpdated = sortByDate([...remainTodos, updatedTodoList[0]]);
     setMyTodoLists(newUpdated);
   };
 
-  const removeTodo = (id, taskSetId) => {
-    const updatedTodoList = myTodoLists.filter((p) => p.id === taskSetId);
-    updatedTodoList[0].tasks = updatedTodoList[0].tasks.filter(
+  const removeTodo = (id, todoSetId) => {
+    const updatedTodoList = myTodoLists.filter((p) => p.id === todoSetId);
+    updatedTodoList[0].todos = updatedTodoList[0].todos.filter(
       (p) => p.id !== id
     );
-    updatedTodoList[0].tasks = sortByDate(updatedTodoList[0].tasks);
-    const remainTodos = myTodoLists.filter((p) => p.id !== taskSetId);
+    updatedTodoList[0].todos = sortByDate(updatedTodoList[0].todos);
+    const remainTodos = myTodoLists.filter((p) => p.id !== todoSetId);
     const newUpdated = sortByDate([...remainTodos, updatedTodoList[0]]);
     setMyTodoLists(newUpdated);
   };
 
-  const addTodo = (todo, taskSetId) => {
-    const updatedTodoList = myTodoLists.filter((p) => p.id === taskSetId);
-    updatedTodoList[0].tasks.push(todo);
-    updatedTodoList[0].tasks = sortByDate(updatedTodoList[0].tasks);
-    const remainTodos = myTodoLists.filter((p) => p.id !== taskSetId);
+  const addTodo = (todo, todoSetId) => {
+    const updatedTodoList = myTodoLists.filter((p) => p.id === todoSetId);
+    updatedTodoList[0].todos.push(todo);
+    updatedTodoList[0].todos = sortByDate(updatedTodoList[0].todos);
+    const remainTodos = myTodoLists.filter((p) => p.id !== todoSetId);
     const newUpdated = sortByDate([...remainTodos, updatedTodoList[0]]);
     setMyTodoLists(newUpdated);
   };

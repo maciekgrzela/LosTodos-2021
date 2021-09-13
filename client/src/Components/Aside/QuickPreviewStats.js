@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const AsideStats = () => {
+const QuickPreviewStats = () => {
   const [statDays, setStatDays] = useState(7);
   const [todosAdded, setTodosAdded] = useState(null);
   const [todosChecked, setTodosChecked] = useState(null);
@@ -33,9 +33,9 @@ const AsideStats = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        let stats = await httpClient.Tasks.stats(Number(statDays));
-        setTodosAdded(stats.taskCreated);
-        setTodosChecked(stats.taskChecked);
+        let stats = await httpClient.Todos.stats(Number(statDays));
+        setTodosAdded(stats.todoCreated);
+        setTodosChecked(stats.todoChecked);
       } catch (e) {
         console.log(e);
       }
@@ -139,4 +139,4 @@ const AsideStats = () => {
   );
 };
 
-export default AsideStats;
+export default QuickPreviewStats;

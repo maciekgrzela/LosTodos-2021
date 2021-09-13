@@ -1,5 +1,5 @@
 import React from 'react';
-import { makeStyles, AppBar, Toolbar, Grid } from '@material-ui/core';
+import { makeStyles, AppBar, Toolbar, Grid, Hidden } from '@material-ui/core';
 import NavbarLogo from './NavbarLogo';
 import NavbarBreadcrumb from './NavbarBreadcrumb';
 import NavbarUserButton from './NavbarUserButton';
@@ -25,7 +25,7 @@ const Navbar = ({ toggledOnMobile, setToggledOnMobile }) => {
   return (
     <AppBar position='fixed' className={styles.root}>
       <Toolbar>
-        <Grid container>
+        <Grid container alignItems='center'>
           <Grid item className={styles.navbarLogo}>
             <NavbarLogo
               toggledOnMobile={toggledOnMobile}
@@ -33,10 +33,14 @@ const Navbar = ({ toggledOnMobile, setToggledOnMobile }) => {
             />
           </Grid>
           <Grid item className={styles.navbarBreadcrumb}>
-            <NavbarBreadcrumb />
+            <Hidden smDown implementation='css'>
+              <NavbarBreadcrumb />
+            </Hidden>
           </Grid>
           <Grid item className={styles.navbarUserButton}>
-            <NavbarUserButton />
+            <Hidden mdDown implementation='css'>
+              <NavbarUserButton />
+            </Hidden>
           </Grid>
         </Grid>
       </Toolbar>
