@@ -4,8 +4,11 @@
 
 Frontend:
 + React - Functional Components
++ Material-UI
++ React-Icons
 + Axios
-+ Style - SCSS, BEM__Methodology, Semantic HTML, 
++ Semantic HTML,
++ useStyles (JS-in-CSS) 
 + React Router,
 + Context API do przechowywania stanu aplikacji
 
