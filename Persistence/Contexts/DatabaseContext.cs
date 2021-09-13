@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Domain.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -11,42 +12,49 @@ namespace Persistence.Contexts
 {
     public class DatabaseContext : IdentityDbContext<AppUser, IdentityRole, string>
     {
-        public DbSet<Tag> Tags {get; set; }
-        public DbSet<Task> Tasks {get; set; }
-        public DbSet<TaskSet> TaskSets {get; set; }
-        public DbSet<TaskSetTags> TaskSetTags {get; set;}
         
-        public DatabaseContext([NotNullAttribute] DbContextOptions<DatabaseContext> options) : base(options) {}
+        public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options) {}
+        
+        public DbSet<Tag> Tags {get; set; }
+        public DbSet<Todo> Todos {get; set; }
+        public DbSet<TodoSet> TodoSets {get; set; }
+        public DbSet<TodoSetTags> TodoSetTags {get; set;}
 
-        public async override System.Threading.Tasks.Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
+        public override int SaveChanges(bool acceptAllChangesOnSuccess)
         {
-            var entries = ChangeTracker
-                .Entries()
-                .Where(e => e.Entity is ModifiedAndCreatedEntity && (
-                        e.State == EntityState.Added
-                        || e.State == EntityState.Modified));
-
-            foreach (var entityEntry in entries)
-            {
-                ((ModifiedAndCreatedEntity)entityEntry.Entity).LastModified = DateTime.Now;
-
-                if (entityEntry.State == EntityState.Added)
-                {
-                    ((ModifiedAndCreatedEntity)entityEntry.Entity).Created = DateTime.Now;
-                }
-            }
-
-            return (await base.SaveChangesAsync(true, cancellationToken));
+            DatesBeforeSaving();
+            return base.SaveChanges(acceptAllChangesOnSuccess);
         }
 
+        public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = new())
+        {
+            DatesBeforeSaving();
+            return await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+        }
+
+        private void DatesBeforeSaving()
+        {
+            var entries = ChangeTracker.Entries()
+                .Where(e => e.Entity is BaseEntity && (e.State == EntityState.Added || e.State == EntityState.Modified));
+
+            foreach (var entry in entries)
+            {
+                ((BaseEntity)entry.Entity).LastModified = DateTime.Now;
+
+                if (entry.State == EntityState.Added)
+                {
+                    ((BaseEntity)entry.Entity).Created = DateTime.Now;
+                }
+            }
+        }
 
         protected override void OnModelCreating(ModelBuilder builder) {
             base.OnModelCreating(builder);
 
-            builder.Entity<TaskSet>()
-                .HasMany(p => p.Tasks)
-                .WithOne(p => p.TaskSet)
-                .HasForeignKey(p => p.TaskSetId)
+            builder.Entity<TodoSet>()
+                .HasMany(p => p.Todos)
+                .WithOne(p => p.TodoSet)
+                .HasForeignKey(p => p.TodoSetId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<AppUser>()
@@ -56,30 +64,30 @@ namespace Persistence.Contexts
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<AppUser>()
-                .HasMany(p => p.TaskSets)
+                .HasMany(p => p.TodoSets)
                 .WithOne(p => p.Owner)
                 .HasForeignKey(p => p.OwnerId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            builder.Entity<TaskSetTags>()
-                .HasKey(tst => new {tst.TagId, tst.TaskSetId});
+            builder.Entity<TodoSetTags>()
+                .HasKey(tst => new {tst.TagId, tst.TodoSetId});
 
-            builder.Entity<TaskSetTags>()
-                .HasOne(p => p.TaskSet)
-                .WithMany(p => p.TaskSetTags)
-                .HasForeignKey(p => p.TaskSetId)
+            builder.Entity<TodoSetTags>()
+                .HasOne(p => p.TodoSet)
+                .WithMany(p => p.TodoSetTags)
+                .HasForeignKey(p => p.TodoSetId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            builder.Entity<TaskSetTags>()
+            builder.Entity<TodoSetTags>()
                 .HasOne(p => p.Tag)
-                .WithMany(p => p.TaskSetTags)
+                .WithMany(p => p.TodoSetTags)
                 .HasForeignKey(p => p.TagId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            builder.Entity<Task>()
-                .HasOne(p => p.TaskSet)
-                .WithMany(p => p.Tasks)
-                .HasForeignKey(p => p.TaskSetId)
+            builder.Entity<Todo>()
+                .HasOne(p => p.TodoSet)
+                .WithMany(p => p.Todos)
+                .HasForeignKey(p => p.TodoSetId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }

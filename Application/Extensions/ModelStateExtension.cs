@@ -6,9 +6,9 @@ namespace Application.Extensions
 {
     public static class ModelStateExtension
     {
-        public static List<string> GetErrors(this ModelStateDictionary dictionary)
+        public static string GetErrors(this ModelStateDictionary dictionary)
         {
-            return dictionary.SelectMany(m => m.Value.Errors).Select(m => m.ErrorMessage).ToList();
+            return string.Join(",", dictionary.SelectMany(m => m.Value.Errors).Select(m => m.ErrorMessage).ToList());
         }
     }
 }

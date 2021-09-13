@@ -9,8 +9,7 @@ namespace Domain.Models
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string PhotoUrl { get; set; }
-        public DateTime DateOfBirth { get; set; }
         public ICollection<Tag> Tags { get; set; }
-        public ICollection<TaskSet> TaskSets { get; set; }
+        public ICollection<TodoSet> TodoSets { get; set; }
     }
 }

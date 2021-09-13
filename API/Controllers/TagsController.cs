@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection.Metadata;
 using System.Threading.Tasks;
 using Application.Extensions;
 using Application.Resources.Tag;
+using Application.Responses;
 using Application.Services.Interfaces;
 using AutoMapper;
 using Domain.Models;
@@ -11,118 +14,84 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class TagsController : Controller
+    public class TagsController : BaseController
     {
-        private readonly IMapper mapper;
-        private readonly ITagService tagService;
-        public TagsController(IMapper mapper, ITagService tagService)
-        {
-            this.tagService = tagService;
-            this.mapper = mapper;
-        }
-
-        [Authorize(Roles = "Admin")]
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllAsync(){
-            var tags = await tagService.GetAllAsync();
-            var resource = mapper.Map<List<Tag>, List<TagResource>>(tags);
+            
+            var tags = await TagService.GetAllAsync();
+            var resource = Mapper.Map<Response<List<Tag>>, Response<List<TagResource>>>(tags);
 
-            return Ok(resource);
+            return HandleResult(resource);
         }
 
-        [Authorize(Roles = "Admin,RegularUser")]
         [HttpGet("my")]
-        public async Task<IActionResult> GetAllForUserAsync(){
-            var tags = await tagService.GetAllForUserAsync();
-
-            if(!tags.Success){
-                return BadRequest(tags.Message);
-            }
-
-            var resource = mapper.Map<List<Tag>, List<MyTagResource>>(tags.Value);
-
-            return Ok(resource);
-        }
-
         [Authorize(Roles = "Admin,RegularUser")]
+        public async Task<IActionResult> GetAllForUserAsync(){
+            
+            var tags = await TagService.GetAllForUserAsync();
+            var resource = Mapper.Map<Response<List<Tag>>, Response<List<MyTagResource>>>(tags);
+        
+            return HandleResult(resource);
+        }
+        
         [HttpGet("{id}")]
+        [Authorize(Roles = "Admin,RegularUser")]
         public async Task<IActionResult> GetAsync(Guid id)
         {
-            var response = await tagService.GetAsync(id);
-
-            if(!response.Success){
-                return BadRequest(response.Message);
-            }
-
-            var taskResource = mapper.Map<Tag, TagResource>(response.Value); 
-            return Ok(taskResource);
+            var tag = await TagService.GetAsync(id);
+            var resource = Mapper.Map<Response<Tag>, Response<TagResource>>(tag); 
+            return HandleResult(resource);
         }
-
-        [Authorize(Roles = "Admin,RegularUser")]
+        
         [HttpPost]
+        [Authorize(Roles = "Admin,RegularUser")]
         public async Task<IActionResult> SaveAsync([FromBody] SaveTagResource resource) 
         {
             if(!ModelState.IsValid){
                 return BadRequest(ModelState.GetErrors());
             }
-
-            var tag = mapper.Map<SaveTagResource, Tag>(resource);
-            var response = await tagService.SaveAsync(tag);
-
-            if(!response.Success){
-                return BadRequest(response.Message);
-            }
-
-            return NoContent();
+        
+            var saveTag = Mapper.Map<SaveTagResource, Tag>(resource);
+            var tagSaved = await TagService.SaveAsync(saveTag);
+            
+            return HandleResult(tagSaved);
         }
-
+        
+        [HttpPost("add/to/todoset")]
         [Authorize(Roles = "Admin,RegularUser")]
-        [HttpPost("add/to/taskset")]
-        public async Task<IActionResult> AddToTaskSetAsync([FromBody] AddTagsToTaskSetResource resource) 
+        public async Task<IActionResult> AddToTodoSetAsync([FromBody] AddTagsToTodoSetResource resource) 
         {
             if(!ModelState.IsValid){
                 return BadRequest(ModelState.GetErrors());
             }
+        
+            var tagsToAdd = Mapper.Map<AddTagsToTodoSetResource, AddTagsToTodoSet>(resource);
+            var tagsAdded = await TagService.AddTagsToTodoSetAsync(tagsToAdd);
 
-            var tag = mapper.Map<AddTagsToTaskSetResource, AddTagsToTaskSet>(resource);
-            var response = await tagService.AddTagsToTaskSetAsync(tag);
-
-            if(!response.Success){
-                return BadRequest(response.Message);
-            }
-
-            return NoContent();
+            return HandleResult(tagsAdded);
         }
-
-        [Authorize(Roles = "Admin")]
+        
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateAsync([FromBody] SaveTagResource resource, Guid id){
+            
             if(!ModelState.IsValid){
                 return BadRequest(ModelState.GetErrors());
             }
+        
+            var tagToUpdate = Mapper.Map<SaveTagResource, Tag>(resource);
+            var tagUpdated = await TagService.UpdateAsync(tagToUpdate, id);
 
-            var tag = mapper.Map<SaveTagResource, Tag>(resource);
-            var response = await tagService.UpdateAsync(tag, id);
-
-            if(!response.Success){
-                return BadRequest(response.Message);
-            }
-
-            return NoContent();
+            return HandleResult(tagUpdated);
         }
-
-        [Authorize(Roles = "Admin")]
+        
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteAsync(Guid id){
-            var response = await tagService.DeleteAsync(id);
-
-            if(!response.Success){
-                return BadRequest(response.Message);
-            }
-
-            return NoContent();
+            var tagDeleted = await TagService.DeleteAsync(id);
+            return HandleResult(tagDeleted);
         }
 
     }

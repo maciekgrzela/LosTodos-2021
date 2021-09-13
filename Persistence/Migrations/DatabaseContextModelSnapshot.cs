@@ -31,9 +31,6 @@ namespace Persistence.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("DateOfBirth")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -123,7 +120,7 @@ namespace Persistence.Migrations
                     b.ToTable("Tags");
                 });
 
-            modelBuilder.Entity("Domain.Models.Task", b =>
+            modelBuilder.Entity("Domain.Models.Todo", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -146,17 +143,17 @@ namespace Persistence.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
-                    b.Property<Guid>("TaskSetId")
+                    b.Property<Guid>("TodoSetId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TaskSetId");
+                    b.HasIndex("TodoSetId");
 
-                    b.ToTable("Tasks");
+                    b.ToTable("Todos");
                 });
 
-            modelBuilder.Entity("Domain.Models.TaskSet", b =>
+            modelBuilder.Entity("Domain.Models.TodoSet", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -180,15 +177,15 @@ namespace Persistence.Migrations
 
                     b.HasIndex("OwnerId");
 
-                    b.ToTable("TaskSets");
+                    b.ToTable("TodoSets");
                 });
 
-            modelBuilder.Entity("Domain.Models.TaskSetTags", b =>
+            modelBuilder.Entity("Domain.Models.TodoSetTags", b =>
                 {
                     b.Property<Guid>("TagId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("TaskSetId")
+                    b.Property<Guid>("TodoSetId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("Created")
@@ -197,11 +194,11 @@ namespace Persistence.Migrations
                     b.Property<DateTime?>("LastModified")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("TagId", "TaskSetId");
+                    b.HasKey("TagId", "TodoSetId");
 
-                    b.HasIndex("TaskSetId");
+                    b.HasIndex("TodoSetId");
 
-                    b.ToTable("TaskSetTags");
+                    b.ToTable("TodoSetTags");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -345,44 +342,44 @@ namespace Persistence.Migrations
                     b.Navigation("Owner");
                 });
 
-            modelBuilder.Entity("Domain.Models.Task", b =>
+            modelBuilder.Entity("Domain.Models.Todo", b =>
                 {
-                    b.HasOne("Domain.Models.TaskSet", "TaskSet")
-                        .WithMany("Tasks")
-                        .HasForeignKey("TaskSetId")
+                    b.HasOne("Domain.Models.TodoSet", "TodoSet")
+                        .WithMany("Todos")
+                        .HasForeignKey("TodoSetId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("TaskSet");
+                    b.Navigation("TodoSet");
                 });
 
-            modelBuilder.Entity("Domain.Models.TaskSet", b =>
+            modelBuilder.Entity("Domain.Models.TodoSet", b =>
                 {
                     b.HasOne("Domain.Models.AppUser", "Owner")
-                        .WithMany("TaskSets")
+                        .WithMany("TodoSets")
                         .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Owner");
                 });
 
-            modelBuilder.Entity("Domain.Models.TaskSetTags", b =>
+            modelBuilder.Entity("Domain.Models.TodoSetTags", b =>
                 {
                     b.HasOne("Domain.Models.Tag", "Tag")
-                        .WithMany("TaskSetTags")
+                        .WithMany("TodoSetTags")
                         .HasForeignKey("TagId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Domain.Models.TaskSet", "TaskSet")
-                        .WithMany("TaskSetTags")
-                        .HasForeignKey("TaskSetId")
+                    b.HasOne("Domain.Models.TodoSet", "TodoSet")
+                        .WithMany("TodoSetTags")
+                        .HasForeignKey("TodoSetId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Tag");
 
-                    b.Navigation("TaskSet");
+                    b.Navigation("TodoSet");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -440,19 +437,19 @@ namespace Persistence.Migrations
                 {
                     b.Navigation("Tags");
 
-                    b.Navigation("TaskSets");
+                    b.Navigation("TodoSets");
                 });
 
             modelBuilder.Entity("Domain.Models.Tag", b =>
                 {
-                    b.Navigation("TaskSetTags");
+                    b.Navigation("TodoSetTags");
                 });
 
-            modelBuilder.Entity("Domain.Models.TaskSet", b =>
+            modelBuilder.Entity("Domain.Models.TodoSet", b =>
                 {
-                    b.Navigation("Tasks");
+                    b.Navigation("Todos");
 
-                    b.Navigation("TaskSetTags");
+                    b.Navigation("TodoSetTags");
                 });
 #pragma warning restore 612, 618
         }

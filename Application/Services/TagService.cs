@@ -16,58 +16,55 @@ namespace Application.Services
         private readonly IUnitOfWork unitOfWork;
         private readonly UserManager<AppUser> userManager;
         private readonly IUserAccessor userAccessor;
-        private readonly ITaskSetRepository taskSetRepository;
-        private readonly ITaskSetTagRepository taskSetTagRepository;
+        private readonly ITodoSetRepository todoSetRepository;
+        private readonly ITodoSetTagRepository todoSetTagRepository;
 
-        public TagService(ITagRepository tagRepository, IUnitOfWork unitOfWork, UserManager<AppUser> userManager, IUserAccessor userAccessor, ITaskSetRepository taskSetRepository, ITaskSetTagRepository taskSetTagRepository)
+        public TagService(ITagRepository tagRepository, IUnitOfWork unitOfWork, UserManager<AppUser> userManager, IUserAccessor userAccessor, ITodoSetRepository todoSetRepository, ITodoSetTagRepository todoSetTagRepository)
         {
-            this.taskSetTagRepository = taskSetTagRepository;
-            this.taskSetRepository = taskSetRepository;
+            this.todoSetTagRepository = todoSetTagRepository;
+            this.todoSetRepository = todoSetRepository;
             this.userAccessor = userAccessor;
             this.userManager = userManager;
             this.unitOfWork = unitOfWork;
             this.tagRepository = tagRepository;
         }
 
-        public async Task<Response<Tag>> AddTagsToTaskSetAsync(AddTagsToTaskSet addTagsToTaskSet)
+        public async Task<Response<Tag>> AddTagsToTodoSetAsync(AddTagsToTodoSet addTagsToTodoSet)
         {
-            var currentTaskSet = await taskSetRepository.SearchAsync(addTagsToTaskSet.TaskSetId);
+            var currentTodoSet = await todoSetRepository.SearchAsync(addTagsToTodoSet.TodoSetId);
 
-            if (currentTaskSet == null)
+            if (currentTodoSet == null)
             {
-                return new Response<Tag>($"Lista zadań o id:{addTagsToTaskSet.TaskSetId} nie istnieje");
+                return Response<Tag>.Failure(ResponseResult.ResourceDoesntExist, $"Lista zadań o id:{addTagsToTodoSet.TodoSetId} nie została znaleziona");
             }
 
-            foreach (var tag in addTagsToTaskSet.Tags)
+            foreach (var tag in addTagsToTodoSet.Tags)
             {
                 var currentTag = await tagRepository.SearchByNameAsync(tag);
                 if (currentTag == null)
                 {
-                    var tempTag = new Tag
-                    {
-                        Name = tag
-                    };
-                    var response = await this.SaveAsync(tempTag);
-                    if(!response.Success)
-                    {
-                        return new Response<Tag>(response.Message);
-                    }
+                    var tempTag = new Tag { Name = tag };
+                    
+                    var response = await SaveAsync(tempTag);
+                    if(!response.Succeed)
+                        return Response<Tag>.Failure(response.Result, response.ErrorMessage);
+                    
 
                     currentTag = response.Value;
                 }
 
-                var entity = new TaskSetTags
+                var entity = new TodoSetTags
                 {
-                    TaskSet = currentTaskSet,
+                    TodoSet = currentTodoSet,
                     Tag = currentTag
                 };
 
-                await taskSetTagRepository.SaveAsync(entity);
+                await todoSetTagRepository.SaveAsync(entity);
             }
 
             await unitOfWork.CommitTransactionAsync();
 
-            return new Response<Tag>(new Tag());
+            return Response<Tag>.Success(ResponseResult.Updated);
         }
 
         public async Task<Response<Tag>> DeleteAsync(Guid id)
@@ -76,18 +73,19 @@ namespace Application.Services
 
             if (tag == null)
             {
-                return new Response<Tag>($"Tag o id:{id} nie został znaleziony");
+                return Response<Tag>.Failure(ResponseResult.ResourceDoesntExist, $"Tag o id:{id} nie został znaleziony");
             }
 
             tagRepository.Delete(tag);
             await unitOfWork.CommitTransactionAsync();
 
-            return new Response<Tag>(tag);
+            return Response<Tag>.Success(ResponseResult.Deleted);
         }
 
-        public async Task<List<Tag>> GetAllAsync()
+        public async Task<Response<List<Tag>>> GetAllAsync()
         {
-            return await tagRepository.GetAllAsync();
+            var tags = await tagRepository.GetAllAsync();
+            return Response<List<Tag>>.Success(ResponseResult.DataObtained, tags);
         }
 
         public async Task<Response<List<Tag>>> GetAllForUserAsync()
@@ -96,11 +94,11 @@ namespace Application.Services
 
             if (user == null)
             {
-                return new Response<List<Tag>>("Użytkownik nie jest aktualnie zalogowany");
+                return Response<List<Tag>>.Failure(ResponseResult.UserIsNotAuthorized, "Użytkownik nie jest aktualnie zalogowany");
             }
 
             var tags = await tagRepository.GetAllForUserAsync(user.Id);
-            return new Response<List<Tag>>(tags);
+            return Response<List<Tag>>.Success(ResponseResult.DataObtained, tags);
         }
 
         public async Task<Response<Tag>> GetAsync(Guid id)
@@ -109,39 +107,42 @@ namespace Application.Services
 
             if (tag == null)
             {
-                return new Response<Tag>($"Tag o id:{id} nie został znaleziony");
+                return Response<Tag>.Failure(ResponseResult.ResourceDoesntExist,$"Tag o id:{id} nie został znaleziony");
             }
 
             var user = await userManager.FindByNameAsync(userAccessor.GetLoggedUserEmail());
             var userRole = await userManager.GetRolesAsync(user);
 
-            if (!userRole[0].Equals("Admin"))
+            if (!userRole[0].Equals("Admin") && tag.OwnerId != user.Id)
             {
-                if (tag.OwnerId != user.Id)
-                {
-                    return new Response<Tag>("Tag o id:{id} nie został znaleziony");
-                }
+                return Response<Tag>.Failure(ResponseResult.ResourceDoesntExist, "Tag o id:{id} nie został znaleziony");
             }
 
-            return new Response<Tag>(tag);
+            return Response<Tag>.Success(ResponseResult.DataObtained, tag);
         }
 
         public async Task<Response<Tag>> SaveAsync(Tag tag)
         {
             var user = await userManager.FindByNameAsync(userAccessor.GetLoggedUserEmail());
 
-            var entity = new Tag()
+            if (user == null)
+            {
+                return Response<Tag>.Failure(ResponseResult.UserIsNotAuthorized,
+                    "Użytkownik nie jest aktualnie zalogowany");
+            }
+
+            var entity = new Tag
             {
                 Id = Guid.NewGuid(),
                 Name = tag.Name,
                 Owner = user,
-                TaskSetTags = new Collection<TaskSetTags>()
+                TodoSetTags = new Collection<TodoSetTags>()
             };
 
             await tagRepository.SaveAsync(entity);
             await unitOfWork.CommitTransactionAsync();
 
-            return new Response<Tag>(entity);
+            return Response<Tag>.Success(ResponseResult.Created);
         }
 
         public async Task<Tag> SearchAsync(Guid id)
@@ -160,18 +161,15 @@ namespace Application.Services
 
             if (currentTag == null)
             {
-                return new Response<Tag>($"Tag o id:{id} nie został znaleziony");
+                return Response<Tag>.Failure(ResponseResult.ResourceDoesntExist, $"Tag o id:{id} nie został znaleziony");
             }
 
             var user = await userManager.FindByNameAsync(userAccessor.GetLoggedUserEmail());
             var userRole = await userManager.GetRolesAsync(user);
 
-            if (!userRole[0].Equals("Admin"))
+            if (!userRole[0].Equals("Admin") && currentTag.OwnerId != user.Id)
             {
-                if (currentTag.OwnerId != user.Id)
-                {
-                    return new Response<Tag>("Tag o id:{id} nie został znaleziony");
-                }
+                return Response<Tag>.Failure(ResponseResult.ResourceDoesntExist, $"Tag o id:{id} nie został znaleziony");
             }
 
             currentTag.Name = tag.Name;
@@ -179,7 +177,7 @@ namespace Application.Services
             tagRepository.Update(currentTag);
             await unitOfWork.CommitTransactionAsync();
 
-            return new Response<Tag>(currentTag);
+            return Response<Tag>.Success(ResponseResult.Updated);
         }
     }
 }

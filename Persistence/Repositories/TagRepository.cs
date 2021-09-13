@@ -25,8 +25,8 @@ namespace Persistence.Repositories
         public async Task<List<Tag>> GetAllAsync()
         {
             return await context.Tags
-                            .Include(p => p.TaskSetTags)
-                            .ThenInclude(p => p.TaskSet)
+                            .Include(p => p.TodoSetTags)
+                            .ThenInclude(p => p.TodoSet)
                             .Include(p => p.Owner)
                             .ToListAsync();
         }
@@ -34,8 +34,8 @@ namespace Persistence.Repositories
         public async Task<List<Tag>> GetAllForUserAsync(string id)
         {
             return await context.Tags
-                            .Include(p => p.TaskSetTags)
-                            .ThenInclude(p => p.TaskSet)
+                            .Include(p => p.TodoSetTags)
+                            .ThenInclude(p => p.TodoSet)
                             .Include(p => p.Owner)
                             .Where(p => p.OwnerId == id)
                             .ToListAsync();
@@ -44,13 +44,13 @@ namespace Persistence.Repositories
         public async Task<Tag> GetAsync(Guid id)
         {
             return await context.Tags
-                            .Include(p => p.TaskSetTags)
-                            .ThenInclude(p => p.TaskSet)
+                            .Include(p => p.TodoSetTags)
+                            .ThenInclude(p => p.TodoSet)
                             .Include(p => p.Owner)
                             .FirstOrDefaultAsync(p => p.Id == id);
         }
 
-        public async System.Threading.Tasks.Task SaveAsync(Tag tag)
+        public async Task SaveAsync(Tag tag)
         {
             await context.Tags.AddAsync(tag);
         }

@@ -1,81 +1,56 @@
 using System.Threading.Tasks;
 using Application.Extensions;
 using Application.Resources.User;
-using Application.Services;
-using Application.Services.Interfaces;
-using AutoMapper;
+using Application.Responses;
 using Domain.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class UsersController : Controller
+    public class UsersController : BaseController
     {
-        private readonly IMapper mapper;
-        private readonly IUserService userService;
-        public UsersController(IMapper mapper, IUserService userService)
-        {
-            this.userService = userService;
-            this.mapper = mapper;
-        }
-
+        
         [HttpGet]
         public async Task<IActionResult> CurrentUser()
         {
-            var user = await userService.GetCurrentUser();
-            if(!user.Success)
-            {
-                return Unauthorized(user.Message);
-            }
-
-            var resource = mapper.Map<LoggedUser, LoggedUserResource>(user.Value);
-            return Ok(resource);
+            var user = await UserService.GetCurrentUser();
+            var resource = Mapper.Map<Response<LoggedUser>, Response<LoggedUserResource>>(user);
+            
+            return HandleResult(resource);
         }
-
+        
         [AllowAnonymous]
         [HttpPost("login")]
-        public async Task<ActionResult> Login([FromBody] UserCredentialsResource credentialsResource)
+        public async Task<IActionResult> Login([FromBody] UserCredentialsResource credentialsResource)
         {
             if(!ModelState.IsValid)
             {
                 return BadRequest(ModelState.GetErrors());
             }
-
-            var credentials = mapper.Map<UserCredentialsResource, UserCredentials>(credentialsResource);
-            var result = await userService.Login(credentials);
-
-            if(!result.Success)
-            {
-                return Unauthorized(result.Message);
-            }
-
-            var resource = mapper.Map<LoggedUser, LoggedUserResource>(result.Value);
-            return Ok(resource);
+        
+            var credentials = Mapper.Map<UserCredentialsResource, UserCredentials>(credentialsResource);
+            var userLogged = await UserService.Login(credentials);
+            var resource = Mapper.Map<Response<LoggedUser>, Response<LoggedUserResource>>(userLogged);
+            
+            return HandleResult(resource);
         }
-
+        
         [AllowAnonymous]
         [HttpPost("login/facebook")]
-        public async Task<ActionResult> FacebookLogin([FromBody] FacebookAccessTokenResource accessTokenResource)
+        public async Task<IActionResult> FacebookLogin([FromBody] FacebookAccessTokenResource accessTokenResource)
         {
             if(!ModelState.IsValid)
             {
                 return BadRequest(ModelState.GetErrors());
             }
-
-            var result = await userService.FacebookLogin(accessTokenResource.AccessToken);
-
-            if(!result.Success)
-            {
-                return Unauthorized(result.Message);
-            }
-
-            var resource = mapper.Map<LoggedUser, LoggedUserResource>(result.Value);
-            return Ok(resource);
+        
+            var loggedByFacebook = await UserService.FacebookLogin(accessTokenResource.AccessToken);
+            var resource = Mapper.Map<Response<LoggedUser>, Response<LoggedUserResource>>(loggedByFacebook);
+            
+            return HandleResult(resource);
         }
-
+        
         [Authorize(Roles = "Admin")]
         [HttpPost("register/admin")]
         public async Task<IActionResult> RegisterAdmin([FromBody] RegisterCredentialsResource registerCredentials)
@@ -84,17 +59,12 @@ namespace API.Controllers
             {
                 return BadRequest(ModelState.GetErrors());
             }
-
-            var credentials = mapper.Map<RegisterCredentialsResource, RegisterCredentials>(registerCredentials);
-            var register = await userService.Register(credentials, "Admin");
-
-            if(!register.Success)
-            {
-                return Unauthorized(register.Message);
-            }
-
-            var resource = mapper.Map<LoggedUser, LoggedUserResource>(register.Value);
-            return Ok(resource);
+        
+            var credentials = Mapper.Map<RegisterCredentialsResource, RegisterCredentials>(registerCredentials);
+            var registered = await UserService.Register(credentials, "Admin");
+            var resource = Mapper.Map<Response<LoggedUser>, Response<LoggedUserResource>>(registered);
+            
+            return HandleResult(resource);
         }
 
         [AllowAnonymous]
@@ -105,37 +75,27 @@ namespace API.Controllers
             {
                 return BadRequest(ModelState.GetErrors());
             }
-
-            var credentials = mapper.Map<RegisterCredentialsResource, RegisterCredentials>(registerCredentials);
-            var register = await userService.Register(credentials, "RegularUser");
-
-            if(!register.Success)
-            {
-                return Unauthorized(register.Message);
-            }
-
-            var resource = mapper.Map<LoggedUser, LoggedUserResource>(register.Value);
-            return Ok(resource);
+        
+            var credentials = Mapper.Map<RegisterCredentialsResource, RegisterCredentials>(registerCredentials);
+            var registered = await UserService.Register(credentials, "RegularUser");
+            var resource = Mapper.Map<Response<LoggedUser>, Response<LoggedUserResource>>(registered);
+            
+            return HandleResult(resource);
         }
-
-        [Authorize(Roles = "Admin,RegularUser")]
+        
         [HttpPut]
+        [Authorize(Roles = "Admin,RegularUser")]
         public async Task<IActionResult> UpdateUserDataAsync([FromBody] UpdateUserResource userResource)
         {
             if(!ModelState.IsValid)
             {
                 return BadRequest(ModelState.GetErrors());
             }
+        
+            var userToUpdate = Mapper.Map<UpdateUserResource, UpdateUser>(userResource);
+            var userUpdated = await UserService.UpdateUserDataAsync(userToUpdate);
 
-            var updateUser = mapper.Map<UpdateUserResource, UpdateUser>(userResource);
-            var update = await userService.UpdateUserDataAsync(updateUser);
-
-            if(!update.Success)
-            {
-                return Unauthorized(update.Message);
-            }
-
-            return NoContent();
+            return HandleResult(userUpdated);
         }
  
     }

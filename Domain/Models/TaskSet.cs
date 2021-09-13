@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Domain.Models
 {
-    public class TaskSet : ModifiedAndCreatedEntity
+    public class TodoSet : BaseEntity
     {
         [Key]
         public Guid Id {get; set;}
@@ -13,7 +13,7 @@ namespace Domain.Models
         public string Name {get; set;}
         public AppUser Owner {get; set;}
         public string OwnerId {get; set;}
-        public ICollection<Task> Tasks {get; set;}
-        public ICollection<TaskSetTags> TaskSetTags {get; set; }
+        public ICollection<Todo> Todos {get; set;}
+        public ICollection<TodoSetTags> TodoSetTags {get; set; }
     }
 }

@@ -1,6 +1,6 @@
 using Application.Resources.Tag;
-using Application.Resources.Task;
-using Application.Resources.TaskSet;
+using Application.Resources.Todo;
+using Application.Resources.TodoSet;
 using Application.Resources.User;
 using AutoMapper;
 using Domain.Models;
@@ -11,12 +11,13 @@ namespace API.Mapping
     {
         public ResourceToModelProfile()
         {
-            CreateMap<SaveTaskResource, Domain.Models.Task>();
-            CreateMap<SaveTaskSetResource, TaskSet>();
+            CreateMap<SaveTodoResource, Todo>();
+            CreateMap<SaveTodoSetResource, TodoSet>();
             CreateMap<SaveTagResource, Tag>();
             CreateMap<UserCredentialsResource, UserCredentials>();
-            CreateMap<AddTagsToTaskSetResource, AddTagsToTaskSet>();
+            CreateMap<AddTagsToTodoSetResource, AddTagsToTodoSet>();
             CreateMap<UpdateUserResource, UpdateUser>();
+            CreateMap<RegisterCredentialsResource, RegisterCredentials>();
         }
     }
 }

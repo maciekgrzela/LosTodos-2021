@@ -35,7 +35,7 @@ namespace Application.Services
             var userInfo = await facebookAccessor.FacebookLogin(accessToken); 
             if(userInfo == null)
             {
-                return new Response<LoggedUser>("Nie udało się zalogować z wykorzystaniem dostawcy: Facebook");
+                return Response<LoggedUser>.Failure(ResponseResult.UserIsNotAuthorized, "Nie udało się zalogować z wykorzystaniem dostawcy: Facebook");
             }
 
             var user = await userManager.FindByNameAsync("fb_" + userInfo.Id);
@@ -49,17 +49,16 @@ namespace Application.Services
                     LastName = userInfo.Name.Split(' ', 2)[1],
                     Email = userInfo.Email,
                     UserName = "fb_" + userInfo.Id,
-                    DateOfBirth = userInfo.Birthday == null ? DateTime.Now : DateTime.Parse(userInfo.Birthday),
                     PhotoUrl = userInfo.Picture.Data.Url,
                     Tags = new Collection<Tag>(),
-                    TaskSets = new Collection<TaskSet>(),
+                    TodoSets = new Collection<TodoSet>(),
                 };
 
                 var result = await userManager.CreateAsync(user);
 
                 if(!result.Succeeded)
                 {
-                    return new Response<LoggedUser>("Nie udało się utworzyć konta użytkownika dla podanych informacji");
+                    return Response<LoggedUser>.Failure(ResponseResult.BadRequestStructure, "Nie udało się utworzyć konta użytkownika dla podanych informacji");
                 }
 
                 await userManager.AddToRoleAsync(user, "RegularUser");
@@ -70,7 +69,7 @@ namespace Application.Services
 
             if (!existingRole)
             {
-                return new Response<LoggedUser>("Nie udało się utworzyć konta użytkownika dla podanych informacjiB");
+                return Response<LoggedUser>.Failure(ResponseResult.BadRequestStructure, "Nie udało się utworzyć konta użytkownika dla podanych informacjiB");
             }
 
             var loggedUser = new LoggedUser
@@ -78,7 +77,6 @@ namespace Application.Services
                 Id = user.Id,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
-                DateOfBirth = user.DateOfBirth,
                 UserName = user.UserName,
                 PhoneNumber = user.PhoneNumber,
                 Email = user.Email,
@@ -86,7 +84,7 @@ namespace Application.Services
                 Token = webTokenGenerator.CreateToken(user, "RegularUser")
             };
 
-            return new Response<LoggedUser>(loggedUser);
+            return Response<LoggedUser>.Success(ResponseResult.DataObtained, loggedUser);
         }
 
         public async Task<Response<LoggedUser>> GetCurrentUser()
@@ -95,7 +93,7 @@ namespace Application.Services
 
             if (user == null)
             {
-                return new Response<LoggedUser>("Użytkownik nie jest aktualnie zalogowany");
+                return Response<LoggedUser>.Failure(ResponseResult.UserIsNotAuthorized, "Użytkownik nie jest aktualnie zalogowany");
             }
 
             var userRole = await userManager.GetRolesAsync(user);
@@ -105,14 +103,13 @@ namespace Application.Services
                 Id = user.Id,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
-                DateOfBirth = user.DateOfBirth,
                 UserName = user.UserName,
                 PhoneNumber = user.PhoneNumber,
                 Email = user.Email,
                 Token = webTokenGenerator.CreateToken(user, userRole[0])
             };
 
-            return new Response<LoggedUser>(loggedUser);
+            return Response<LoggedUser>.Success(ResponseResult.DataObtained, loggedUser);
         }
 
         public async Task<Response<LoggedUser>> Login(UserCredentials credentials)
@@ -121,7 +118,7 @@ namespace Application.Services
 
             if (user == null)
             {
-                return new Response<LoggedUser>($"Użytkownik o adresie:{credentials.Email} nie został znaleziony");
+                return Response<LoggedUser>.Failure(ResponseResult.ResourceDoesntExist,$"Użytkownik o adresie:{credentials.Email} nie został znaleziony");
             }
 
             var result = await signInManager.CheckPasswordSignInAsync(user, credentials.Password, false);
@@ -129,7 +126,7 @@ namespace Application.Services
             var userRoles = await userManager.GetRolesAsync(user);
 
             if (!result.Succeeded) 
-                return new Response<LoggedUser>("Dane uwierzytelniające są nieprawidłowe");
+                return Response<LoggedUser>.Failure(ResponseResult.UserIsNotAuthorized, "Dane uwierzytelniające są nieprawidłowe");
             
             
             var loggedUser = new LoggedUser()
@@ -137,14 +134,13 @@ namespace Application.Services
                 Id = user.Id,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
-                DateOfBirth = user.DateOfBirth,
                 UserName = user.UserName,
                 PhoneNumber = user.PhoneNumber,
                 Email = user.Email,
                 Token = webTokenGenerator.CreateToken(user, userRoles[0])
             };
 
-            return new Response<LoggedUser>(loggedUser);
+            return Response<LoggedUser>.Success(ResponseResult.DataObtained, loggedUser);
 
         }
 
@@ -154,31 +150,31 @@ namespace Application.Services
 
             if (existingUser != null)
             {
-                return new Response<LoggedUser>($"Użytkownik o adresie e-mail: {credentials.Email} już istnieje!");
+                return Response<LoggedUser>.Failure(ResponseResult.BadRequestStructure, $"Użytkownik o adresie e-mail: {credentials.Email} już istnieje!");
             }
 
             var existingRole = await roleManager.RoleExistsAsync(userRole);
 
             if (!existingRole)
             {
-                return new Response<LoggedUser>($"Rola: {userRole} nie istnieje w systemie!");
+                return Response<LoggedUser>.Failure(ResponseResult.ResourceDoesntExist, $"Rola: {userRole} nie istnieje w systemie!");
             }
 
             var user = new AppUser
             {
                 FirstName = credentials.FirstName,
                 LastName = credentials.LastName,
-                DateOfBirth = credentials.DateOfBirth,
+                UserName = $"{credentials.FirstName}{credentials.LastName}{Guid.NewGuid().ToString()}",
                 Email = credentials.Email,
                 Tags = new Collection<Tag>(),
-                TaskSets = new Collection<TaskSet>(),
+                TodoSets = new Collection<TodoSet>(),
             };
 
             var result = await userManager.CreateAsync(user, credentials.Password);
 
             if (!result.Succeeded)
             {
-                return new Response<LoggedUser>("Nie udało się utworzyć nowego użytkownika");
+                return Response<LoggedUser>.Failure(ResponseResult.InternalError, "Nie udało się utworzyć nowego użytkownika");
             }
 
             await userManager.AddToRoleAsync(user, userRole);
@@ -189,14 +185,13 @@ namespace Application.Services
                 Id = user.Id,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
-                DateOfBirth = user.DateOfBirth,
                 UserName = user.UserName,
                 PhoneNumber = user.PhoneNumber,
                 Email = user.Email,
                 Token = webTokenGenerator.CreateToken(user, userRole)
             };
 
-            return new Response<LoggedUser>(logged);
+            return Response<LoggedUser>.Success(ResponseResult.DataObtained, logged);
         }
 
         public async Task<Response<UpdateUser>> UpdateUserDataAsync(UpdateUser updateUser)
@@ -205,23 +200,22 @@ namespace Application.Services
 
             if (existingUser == null)
             {
-                return new Response<UpdateUser>("Zaloguj się aby wykonać tę operację!");
+                return Response<UpdateUser>.Failure(ResponseResult.UserIsNotAuthorized,"Zaloguj się aby wykonać tę operację!");
             }
 
             existingUser.Email = updateUser.Email;
             existingUser.PhoneNumber = updateUser.PhoneNumber;
             existingUser.FirstName = updateUser.FirstName;
             existingUser.LastName = updateUser.LastName;
-            existingUser.DateOfBirth = updateUser.DateOfBirth;
 
             var result = await userManager.UpdateAsync(existingUser);
 
             if (!result.Succeeded)
             {
-                return new Response<UpdateUser>(result.Errors.ToString());
+                return Response<UpdateUser>.Failure(ResponseResult.InternalError, result.Errors.ToString());
             }
 
-            return new Response<UpdateUser>(updateUser);
+            return Response<UpdateUser>.Success(ResponseResult.Updated);
         }
     }
 }

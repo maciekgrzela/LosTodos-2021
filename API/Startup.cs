@@ -34,22 +34,12 @@ namespace API
 
         public IConfiguration Configuration { get; }
 
-        public void ConfigureDevelopmentServices(IServiceCollection services) {
+        public void ConfigureServices(IServiceCollection services)
+        {
             services.AddDbContext<DatabaseContext>(opt => {
                 opt.UseSqlServer(Configuration.GetConnectionString("SqlServerDevelopment"), o => o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery));
             });
-            ConfigureServices(services);
-        }
-
-        public void ConfigureProductionServices(IServiceCollection services) {
-            services.AddDbContext<DatabaseContext>(opt => {
-                opt.UseSqlServer(Configuration.GetConnectionString("SqlServerProduction"), o => o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery));
-            });
-            ConfigureServices(services);
-        }
-
-        public void ConfigureServices(IServiceCollection services)
-        {
+            
             services.AddControllers();
 
             services.AddSignalR();
@@ -136,13 +126,13 @@ namespace API
             services.AddScoped<IUserAccessor, UserAccessor>();
             services.AddScoped<IFacebookAccessor, FacebookAccessor>();
             services.AddScoped<IWebTokenGenerator, WebTokenGenerator>();
-            services.AddScoped<ITaskService, TaskService>();
-            services.AddScoped<ITaskSetService, TaskSetService>();
-            services.AddScoped<ITaskRepository, TaskRepository>();
-            services.AddScoped<ITaskSetRepository, TaskSetRepository>();
+            services.AddScoped<ITodoService, TodoService>();
+            services.AddScoped<ITodoSetService, TodoSetService>();
+            services.AddScoped<ITodoRepository, TodoRepository>();
+            services.AddScoped<ITodoSetRepository, TodoSetRepository>();
             services.AddScoped<ITagService, TagService>();
             services.AddScoped<ITagRepository, TagRepository>();
-            services.AddScoped<ITaskSetTagRepository, TaskSetTagRepository>();
+            services.AddScoped<ITodoSetTagRepository, TodoSetTagRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.Configure<FacebookAppSettings>(Configuration.GetSection("Authentication:Facebook"));
 
