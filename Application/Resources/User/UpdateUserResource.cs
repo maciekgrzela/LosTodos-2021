@@ -15,7 +15,5 @@ namespace Application.Resources.User
         public string FirstName { get; set; }
         [Required]
         public string LastName { get; set; }
-        [Required]
-        public DateTime DateOfBirth { get; set; }
     }
 }

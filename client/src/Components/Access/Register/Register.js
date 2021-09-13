@@ -8,12 +8,15 @@ import {
   InputAdornment,
   Snackbar,
 } from '@material-ui/core';
-import { Face, LockOpen, PersonAdd } from '@material-ui/icons';
+import {
+  Email,
+  EmojiEmotions,
+  InsertEmoticon,
+  LockOpen,
+} from '@material-ui/icons';
 import { Alert } from '@material-ui/lab';
-import { AiOutlineFacebook } from 'react-icons/ai';
 import httpClient from '../../../API/httpClient';
 import { LosTodosContext } from '../../../App';
-import FacebookLogin from 'react-facebook-login/dist/facebook-login-render-props';
 import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
@@ -46,14 +49,7 @@ const useStyles = makeStyles((theme) => ({
   textFieldLabel: {
     color: '#fff',
   },
-  facebookBtn: {
-    color: '#fff',
-    backgroundColor: '#3B5998',
-    '&:hover': {
-      backgroundColor: '#2F4779',
-    },
-  },
-  registerBtn: {
+  backToLoginBtn: {
     '& a': {
       textDecoration: 'none',
       color: 'unset',
@@ -104,38 +100,20 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Login = () => {
+const Register = () => {
   const styles = useStyles();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [accessError, setAccessError] = useState('');
 
   const { login } = useContext(LosTodosContext);
 
-  const handleFacebookLogin = async (response) => {
-    try {
-      const resource = {
-        accessToken: response.accessToken,
-      };
-      const user = await httpClient.User.facebookLogin(resource);
-      login(user);
-    } catch (error) {
-      if (error.response) {
-        setAccessError(
-          `Błąd: ${error.response.status}. ${error.response.data}`
-        );
-      } else if (error.request) {
-        setAccessError('Błąd: Nie udało się wysłać żądania. Spróbuj ponownie');
-      } else {
-        setAccessError('Wystąpił nieoczekiwany błąd. Spróbuj ponownie');
-      }
-    }
-  };
-
-  const handleLogin = async () => {
+  const handleRegister = async () => {
     const emailRegEx =
       /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
     const passwordRegEx =
@@ -154,10 +132,12 @@ const Login = () => {
     const credentials = {
       email: email,
       password: password,
+      firstName: firstName,
+      lastName: lastName,
     };
 
     try {
-      const user = await httpClient.User.login(credentials);
+      const user = await httpClient.User.register(credentials);
       login(user);
     } catch (error) {
       if (error.response) {
@@ -214,7 +194,7 @@ const Login = () => {
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              handleLogin();
+              handleRegister();
             }}
             className={styles.form}
             autoComplete='off'
@@ -228,7 +208,49 @@ const Login = () => {
               InputProps={{
                 startAdornment: (
                   <InputAdornment position='start'>
-                    <Face />
+                    <InsertEmoticon />
+                  </InputAdornment>
+                ),
+              }}
+              type='text'
+              placeholder='Wprowadź imię'
+              label='Imię użytkownika'
+              variant='outlined'
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              required
+            />
+            <TextField
+              className={styles.textField}
+              InputLabelProps={{
+                className: styles.textFieldLabel,
+              }}
+              fullWidth
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position='start'>
+                    <EmojiEmotions />
+                  </InputAdornment>
+                ),
+              }}
+              type='text'
+              placeholder='Wprowadź nazwisko'
+              label='Nazwisko użytkownika'
+              variant='outlined'
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              required
+            />
+            <TextField
+              className={styles.textField}
+              InputLabelProps={{
+                className: styles.textFieldLabel,
+              }}
+              fullWidth
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position='start'>
+                    <Email />
                   </InputAdornment>
                 ),
               }}
@@ -270,38 +292,26 @@ const Login = () => {
             <Button
               type='submit'
               variant='contained'
-              disabled={email === '' || password === ''}
+              disabled={
+                email === '' ||
+                password === '' ||
+                firstName === '' ||
+                lastName === ''
+              }
               className={styles.loginBtn}
             >
-              Zaloguj
+              Zarejestruj
             </Button>
           </form>
           <Grid container item style={{ marginTop: 20 }}>
             <Button
               fullWidth
-              onClick={() => {}}
-              className={styles.registerBtn}
+              className={styles.backToLoginBtn}
               variant='contained'
-              startIcon={<PersonAdd />}
+              startIcon={<LockOpen />}
             >
-              <Link to='/register'>Przejdź do strony rejestracji</Link>
+              <Link to='/login'>Powrót do logowania</Link>
             </Button>
-            <FacebookLogin
-              appId='5102215729852842'
-              callback={handleFacebookLogin}
-              fields='name,email,birthday,picture'
-              render={(renderProps) => (
-                <Button
-                  fullWidth
-                  onClick={renderProps.onClick}
-                  className={styles.facebookBtn}
-                  variant='contained'
-                  startIcon={<AiOutlineFacebook size='1.5rem' />}
-                >
-                  Zaloguj się za pomocą facebooka
-                </Button>
-              )}
-            />
           </Grid>
         </Grid>
       </Grid>
@@ -309,4 +319,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Register;

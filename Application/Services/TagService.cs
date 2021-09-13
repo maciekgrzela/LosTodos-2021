@@ -43,14 +43,13 @@ namespace Application.Services
                 var currentTag = await tagRepository.SearchByNameAsync(tag);
                 if (currentTag == null)
                 {
-                    var tempTag = new Tag { Name = tag };
+                    var tempTag = new Tag { Id = Guid.NewGuid(), Name = tag };
                     
                     var response = await SaveAsync(tempTag);
                     if(!response.Succeed)
                         return Response<Tag>.Failure(response.Result, response.ErrorMessage);
                     
-
-                    currentTag = response.Value;
+                    currentTag = tempTag;
                 }
 
                 var entity = new TodoSetTags

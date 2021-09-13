@@ -40,27 +40,28 @@ namespace Persistence.Repositories
                         .FirstOrDefaultAsync(p => p.Id == id);
         }
 
-        public async Task<Domain.Models.ProductivityStat> GetProductivityStats(int days, string id)
+        public async Task<ProductivityStat> GetProductivityStats(int days, string id)
         {
-            var stats = new ProductivityStat()
+            var stats = new ProductivityStat
             {
                 TodoCreated = 0,
                 TodoChecked = 0
             };
 
             var createdTodos = await context.Todos
-                                    .Include(p => p.TodoSet)
-                                    .Where(p => DateTime.Now.AddDays(Convert.ToDouble(-days)).CompareTo(p.Created) <= 0 && p.TodoSet.OwnerId == id)
-                                    .ToListAsync();
-                                    
-            if(createdTodos != null)
+                .Include(p => p.TodoSet)
+                .Where(p => DateTime.Now.AddDays(Convert.ToDouble(-days)).CompareTo(p.Created) <= 0 && p.TodoSet.OwnerId == id)
+                .ToListAsync();
+
+            if(createdTodos.Count > 0)
             {
+                
                 stats.TodoCreated = createdTodos.Count;
             }
 
-            var checkedTodos = createdTodos.Where(p => p.Checked == true).ToList();
+            var checkedTodos = createdTodos.Where(p => p.Checked).ToList();
 
-            if(checkedTodos != null)
+            if(checkedTodos.Count > 0)
             {
                 stats.TodoChecked = checkedTodos.Count;
             }

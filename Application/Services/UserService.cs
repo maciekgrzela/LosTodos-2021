@@ -129,7 +129,7 @@ namespace Application.Services
                 return Response<LoggedUser>.Failure(ResponseResult.UserIsNotAuthorized, "Dane uwierzytelniające są nieprawidłowe");
             
             
-            var loggedUser = new LoggedUser()
+            var loggedUser = new LoggedUser
             {
                 Id = user.Id,
                 FirstName = user.FirstName,

@@ -30,6 +30,7 @@ namespace Persistence.Repositories
                                 .Include(p => p.TodoSetTags)
                                 .ThenInclude(p => p.Tag)
                                 .Include(p => p.Owner)
+                                .OrderByDescending(p => p.Created)
                                 .ToListAsync();
         }
 
@@ -41,6 +42,7 @@ namespace Persistence.Repositories
                                 .ThenInclude(p => p.Tag)
                                 .Include(p => p.Owner)
                                 .Where(p => p.OwnerId == id)
+                                .OrderByDescending(p => p.Created)
                                 .ToListAsync();
         }
 
