@@ -9,6 +9,6 @@ namespace Application.Resources.Tag
         public string Name {get; set;}
         public DateTime Created {get; set;}
         public DateTime? LastModified {get; set;}
-        public ICollection<TaskSetForTagResource> TaskSets {get; set;}
+        public ICollection<TodoSetForTagResource> TodoSets {get; set;}
     }
 }

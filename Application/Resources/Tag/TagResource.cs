@@ -11,6 +11,6 @@ namespace Application.Resources.Tag
         public DateTime Created {get; set;}
         public DateTime? LastModified {get; set;}
         public OwnerResource Owner {get; set;}
-        public ICollection<TaskSetForTagResource> TaskSets {get; set;}
+        public ICollection<TodoSetForTagResource> TodoSets {get; set;}
     }
 }

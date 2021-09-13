@@ -8,12 +8,13 @@ import {
   InputAdornment,
   Snackbar,
 } from '@material-ui/core';
-import { Face, LockOpen } from '@material-ui/icons';
+import { Face, LockOpen, PersonAdd } from '@material-ui/icons';
 import { Alert } from '@material-ui/lab';
 import { AiOutlineFacebook } from 'react-icons/ai';
 import httpClient from '../../../API/httpClient';
 import { LosTodosContext } from '../../../App';
 import FacebookLogin from 'react-facebook-login/dist/facebook-login-render-props';
+import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
   wrapper: {
@@ -52,6 +53,15 @@ const useStyles = makeStyles((theme) => ({
       backgroundColor: '#2F4779',
     },
   },
+  registerBtn: {
+    '& a': {
+      textDecoration: 'none',
+      color: 'unset',
+    },
+    marginBottom: 10,
+    color: theme.palette.primary.main,
+    backgroundColor: theme.palette.white.main,
+  },
   form: {
     '& .MuiOutlinedInput-input': {
       padding: '13px 14px',
@@ -67,20 +77,20 @@ const useStyles = makeStyles((theme) => ({
       },
     },
     '& label.Mui-focused': {
-      color: 'white',
+      color: theme.palette.white.main,
     },
     '& .MuiOutlinedInput-root': {
       '& fieldset': {
-        borderColor: 'white',
-        color: 'white',
+        borderColor: theme.palette.white.main,
+        color: theme.palette.white.main,
       },
       '&:hover fieldset': {
-        borderColor: 'white',
-        color: 'white',
+        borderColor: theme.palette.white.main,
+        color: theme.palette.white.main,
       },
       '&.Mui-focused fieldset': {
-        borderColor: 'white',
-        color: 'white',
+        borderColor: theme.palette.white.main,
+        color: theme.palette.white.main,
       },
     },
   },
@@ -111,10 +121,8 @@ const Login = () => {
         accessToken: response.accessToken,
       };
       const user = await httpClient.User.facebookLogin(resource);
-      console.log('Facebook users data: ', user);
       login(user);
     } catch (error) {
-      console.log(error);
       if (error.response) {
         setAccessError(
           `Błąd: ${error.response.status}. ${error.response.data}`
@@ -269,6 +277,15 @@ const Login = () => {
             </Button>
           </form>
           <Grid container item style={{ marginTop: 20 }}>
+            <Button
+              fullWidth
+              onClick={() => {}}
+              className={styles.registerBtn}
+              variant='contained'
+              startIcon={<PersonAdd />}
+            >
+              <Link to='/register'>Przejdź do strony rejestracji</Link>
+            </Button>
             <FacebookLogin
               appId='5102215729852842'
               callback={handleFacebookLogin}

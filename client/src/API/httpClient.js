@@ -25,22 +25,22 @@ const requests = {
 
 const Tags = {
   myTags: () => requests.get('/tags/my'),
-  addToTaskSet: (tags) => requests.post('/tags/add/to/taskset', tags),
+  addToTodoSet: (tags) => requests.post('/tags/add/to/todoset', tags),
 };
 
-const Tasks = {
-  add: (task) => requests.post('/todo', task),
-  addMultiple: (tasks) => requests.post('/todo/list', tasks),
-  update: (task, id) => requests.put(`/todo/${id}`, task),
-  get: (id) => requests.get(`/todo/${id}`),
-  remove: (id) => requests.delete(`/todo/${id}`),
-  stats: (days) => requests.get(`/todo/stats/${days}`),
+const Todos = {
+  add: (todo) => requests.post('/todos', todo),
+  addMultiple: (todos) => requests.post('/todos/list', todos),
+  update: (todo, id) => requests.put(`/todos/${id}`, todo),
+  get: (id) => requests.get(`/todos/${id}`),
+  remove: (id) => requests.delete(`/todos/${id}`),
+  stats: (days) => requests.get(`/todos/stats/${days}`),
 };
 
-const TaskSets = {
-  myTaskSets: () => requests.get('/todolist/my'),
-  create: (taskSet) => requests.post('/todolist', taskSet),
-  remove: (id) => requests.delete(`/todolist/${id}`),
+const TodoSets = {
+  myTodoSets: () => requests.get('/todoSets/my'),
+  create: (todoSet) => requests.post('/todoSets', todoSet),
+  remove: (id) => requests.delete(`/todoSets/${id}`),
 };
 
 const User = {
@@ -49,11 +49,12 @@ const User = {
   update: (user) => requests.put('/users', user),
   facebookLogin: (accessToken) =>
     requests.post('/users/login/facebook', accessToken),
+  register: (user) => requests.post('/users/register', user),
 };
 
 export default {
   Tags,
-  Tasks,
-  TaskSets,
+  Todos,
+  TodoSets,
   User,
 };

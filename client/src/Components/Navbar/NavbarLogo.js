@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  makeStyles,
-  Grid,
-  Typography,
-  IconButton,
-  Hidden,
-} from '@material-ui/core';
+import { makeStyles, Grid, Typography, IconButton } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 
 const useStyles = makeStyles((theme) => ({
@@ -21,8 +15,9 @@ const useStyles = makeStyles((theme) => ({
     fontSize: '2rem',
   },
   logoBtn: {
-    [theme.breakpoints.up('sm')]: {
-      display: 'none',
+    display: 'none',
+    [theme.breakpoints.down('md')]: {
+      display: 'flex',
     },
   },
 }));

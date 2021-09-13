@@ -15,8 +15,11 @@ import { LosTodosContext } from '../../App';
 import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
-  root: {},
+  root: {
+    position: 'relative',
+  },
   userButton: {
+    width: 220,
     backgroundColor: 'white',
     padding: '5px 20px',
     '&:hover': {
@@ -25,10 +28,7 @@ const useStyles = makeStyles((theme) => ({
   },
   userList: {
     '& .MuiMenu-paper': {
-      top: '75px !important',
-    },
-    '& .MuiMenuItem-root': {
-      paddingRight: 50,
+      width: 220,
     },
   },
 }));
@@ -39,8 +39,8 @@ const NavbarUserButton = () => {
   const [userMenuAnchorElement, setUserMenuAnchorElement] = useState(null);
 
   return (
-    <Grid container className={styles.root}>
-      <Grid item>
+    <Grid container>
+      <Grid item className={styles.root}>
         <Button
           className={styles.userButton}
           onClick={(e) => {

@@ -5,7 +5,7 @@ namespace Domain.Models
     [NotMapped]
     public class ProductivityStat
     {
-        public int TaskCreated {get; set;}
-        public int TaskChecked {get; set;}   
+        public int TodoCreated {get; set;}
+        public int TodoChecked {get; set;}   
     }
 }

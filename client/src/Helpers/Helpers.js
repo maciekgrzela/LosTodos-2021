@@ -1,17 +1,18 @@
-function groupByDate(array) {
-  return array.reduce((object, arrayElement) => {
+const groupByDate = (array) =>
+  array.reduce((object, arrayElement) => {
     object[arrayElement['created'].substr(0, 10)] =
       object[arrayElement['created'].substr(0, 10)] === undefined
         ? []
         : object[arrayElement['created'].substr(0, 10)];
-    arrayElement.tasks = sortByDate(arrayElement.tasks);
+    arrayElement.todos = sortByDate(arrayElement.todos);
     object[arrayElement['created'].substr(0, 10)].push(arrayElement);
     return object;
   }, {});
-}
 
 const sortByDate = (array) => {
-  return array.sort((a, b) => new Date(b.created) - new Date(a.created));
+  return array.length > 0
+    ? array.sort((a, b) => new Date(b.created) - new Date(a.created))
+    : array;
 };
 
 export { groupByDate, sortByDate };
